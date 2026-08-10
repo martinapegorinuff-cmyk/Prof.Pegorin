@@ -87,3 +87,207 @@ footer{max-width:1500px;margin:20px auto 0;padding:18px 24px;border-top:1px soli
  .welcome-card img{width:140px;height:140px}.welcome-card h1{font-size:1.8rem}
  .topic-cards,.large-category-grid{grid-template-columns:1fr}.profile-card{flex-direction:column}
 }
+
+
+/* ===== v0.3 MAGICAL ACADEMY VISUAL REDESIGN ===== */
+:root{
+ --navy:#17283d;
+ --navy2:#0d1b2a;
+ --blue:#b8c6cf;
+ --blue2:#e8ecec;
+ --cream:#efe3c8;
+ --paper:#f7efd9;
+ --gold:#b98a35;
+ --gold2:#d9b968;
+ --ink:#25261f;
+ --muted:#746b5d;
+ --line:#b9a98a;
+ --burgundy:#6d2730;
+ --forest:#314c3b;
+ --plum:#49364f;
+}
+body{
+ background:
+   radial-gradient(circle at 15% 15%,rgba(185,138,53,.08),transparent 24%),
+   radial-gradient(circle at 85% 25%,rgba(49,76,59,.07),transparent 22%),
+   linear-gradient(#e9dfc8,#f5eddb 42%,#e8ddc4);
+ color:var(--ink);
+}
+.site-header{background:#e8ddc4}
+.banner-wrap{
+ height:auto;
+ min-height:0;
+ overflow:visible;
+ background:#f7efd9;
+ border-bottom:1px solid #a98a53;
+}
+.banner{
+ width:100%;
+ height:auto;
+ max-height:none;
+ object-fit:contain;
+ object-position:center;
+ display:block;
+}
+.topnav{
+ background:
+   linear-gradient(90deg,rgba(13,27,42,.98),rgba(28,42,54,.98),rgba(13,27,42,.98));
+ border-top:1px solid #c8a85e;
+ border-bottom:2px solid #8e6b31;
+ box-shadow:inset 0 1px #ffffff12;
+}
+.nav-item{font-size:.9rem;letter-spacing:.05em}
+.nav-item:hover,.nav-item.active{
+ background:linear-gradient(#ffffff08,#00000010);
+ border-bottom-color:var(--gold2);
+ color:#f4e7c4;
+}
+.profile{border-left:1px solid #d9b96844}
+.profile img{border:2px solid var(--gold2);box-shadow:0 0 0 2px #16283b}
+
+.side-panel,.welcome-card,.progress-card,.house-card,.achievement-card,.table-card,
+.profile-card,.teacher-dashboard,.coming,.stat{
+ background:
+   linear-gradient(rgba(247,239,217,.96),rgba(239,227,200,.96));
+ border:1px solid #b7a27d;
+ box-shadow:0 4px 14px #2d251914,inset 0 0 0 3px #ffffff22;
+}
+.side-panel{border-top:4px solid var(--burgundy)}
+.side-panel h3,.section-head h2,.section-head h3,.page-title h1{color:var(--navy)}
+.side-panel>button{border-bottom:1px solid #cdbf9f}
+.side-panel>button:hover,.side-panel .side-active{
+ background:linear-gradient(90deg,#d8c9aa,#efe5cf);
+ color:#4b2c24;
+ box-shadow:inset 3px 0 var(--gold);
+}
+.quote-box{border-top:1px solid #aa8750;position:relative}
+.quote-box:after{content:"✦";position:absolute;right:10px;bottom:8px;color:var(--gold);font-size:1.4rem}
+
+.welcome-card{
+ border-top:4px solid var(--navy);
+ position:relative;
+ background:
+   radial-gradient(circle at 78% 35%,rgba(185,138,53,.14),transparent 25%),
+   linear-gradient(135deg,#f8f0dc,#e8dcc2);
+}
+.welcome-card:before{
+ content:"✦  ✧  ✦";
+ position:absolute;top:12px;right:18px;color:#b98a35;font-size:1rem;letter-spacing:.5em
+}
+.welcome-card h1{color:#233750}
+.welcome-actions button,.house-card button,.profile-card button,.coming button{
+ border:1px solid #826129;
+ background:linear-gradient(#d9b968,#b98a35);
+ color:#241d12;
+ box-shadow:inset 0 1px #f5df9d;
+}
+.welcome-actions .secondary{
+ background:linear-gradient(#e5ddc8,#cdbd9d);
+ border-color:#9b8762;
+ color:#2d3540
+}
+
+.illustrated-card{
+ background:
+   radial-gradient(circle at 85% 10%,rgba(185,138,53,.13),transparent 18%),
+   linear-gradient(180deg,#f6ecd5,#dfd2b7);
+ border:1px solid #a89067;
+ box-shadow:0 4px 10px #32261815,inset 0 0 0 3px #fff4d91f;
+}
+.illustrated-card:nth-child(1){border-top:5px solid var(--burgundy)}
+.illustrated-card:nth-child(2){border-top:5px solid var(--forest)}
+.illustrated-card:nth-child(3){border-top:5px solid var(--plum)}
+.illustrated-card:nth-child(4){border-top:5px solid var(--navy)}
+.illustrated-card .art{
+ color:#4b3826;
+ text-shadow:0 1px #fff4d0;
+}
+.illustrated-card h3{color:#30291e;letter-spacing:.06em}
+.illustrated-card p{color:#756650}
+.illustrated-card:hover{
+ box-shadow:0 8px 20px #261d1228;
+ border-color:#8b6b39;
+}
+
+.progress-card{border-top:4px solid var(--forest)}
+.house-card{border-top:4px solid var(--burgundy)}
+.achievement-card{border-top:4px solid var(--gold)}
+.bar,.goalbar{background:#d7c8a8;border-color:#a89470}
+.bar i,.goalbar i{background:linear-gradient(90deg,#263c50,#607b80)}
+.crest{
+ background:radial-gradient(circle,#e5ca80,#a8782e);
+ border:4px double #6f5227;
+ box-shadow:0 2px 7px #0002;
+}
+
+.large-category-grid button,.unit,.topic,.badge,.stat{
+ background:
+   radial-gradient(circle at 90% 10%,rgba(185,138,53,.11),transparent 22%),
+   linear-gradient(#f7efd9,#e8dcc1);
+ border-color:#ad9871;
+ color:#2d302b;
+}
+.large-category-grid button:hover,.topic:hover,.unit:hover{
+ border-color:#7d633c;
+ box-shadow:0 6px 14px #2c221624;
+}
+.topic-section h2{border-bottom-color:#9d7435}
+th{background:#d4c6a8;color:#2b3743}
+th,td{border-bottom-color:#cbbd9e}
+.rank{background:linear-gradient(#f7efd9,#e9dec6);border-color:#ad9871}
+.rank.first{background:linear-gradient(90deg,#f8efd5,#e7cf8e);border-color:#99702f}
+.rank span{background:#d2c2a1}
+.demo-note{color:#756b5b}
+footer{border-top-color:#aa9878;color:#6c6253}
+
+/* parchment ornaments */
+.page-title h1:after{
+ content:"";
+ display:block;
+ width:90px;height:1px;
+ margin:10px auto 0;
+ background:linear-gradient(90deg,transparent,#a77b37,transparent);
+}
+.section-head h2:before,.section-head h3:before{
+ content:"✦";
+ color:var(--gold);
+ margin-right:7px;
+ font-size:.8em;
+}
+
+/* Remove unused goal styling from visual flow */
+.goal-card{display:none!important}
+
+@media(max-width:760px){
+ .banner-wrap{height:auto}
+ .banner{height:auto;object-fit:contain}
+}
+
+
+/* ===== v0.3.1 BANNER FIX =====
+   The full natural image was making the header enormous.
+   Use it as a deliberately cropped panoramic banner instead.
+*/
+.banner-wrap{
+  height:260px !important;
+  overflow:hidden !important;
+  background:#f7efd9 !important;
+}
+.banner{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center 48% !important;
+  display:block !important;
+}
+
+@media(max-width:1100px){
+  .banner-wrap{height:220px !important}
+}
+@media(max-width:760px){
+  .banner-wrap{height:155px !important}
+  .banner{
+    object-fit:cover !important;
+    object-position:center 48% !important;
+  }
+}
