@@ -1,0 +1,89 @@
+
+:root{
+ --navy:#163b63;--navy2:#0f2f52;--blue:#b9d4e7;--blue2:#e9f2f8;
+ --cream:#fbf5e9;--paper:#fffaf2;--gold:#d7a342;--gold2:#f0cf83;
+ --ink:#193652;--muted:#6d7a86;--line:#d9d0bf;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,'Times New Roman',serif;background:#f7f2e9;color:var(--ink)}
+button{font-family:inherit}
+.site-header{background:#fff;box-shadow:0 2px 8px #0002;position:sticky;top:0;z-index:20}
+.banner-wrap{height:190px;overflow:hidden;background:#fff}
+.banner{width:100%;height:100%;object-fit:cover;display:block}
+.topnav{background:linear-gradient(90deg,var(--navy2),var(--navy));display:flex;align-items:center;gap:0;padding:0 24px;color:#fff;min-height:58px}
+.nav-item{background:none;border:0;color:white;padding:18px 16px;font-size:.92rem;letter-spacing:.02em;cursor:pointer;border-bottom:3px solid transparent}
+.nav-item:hover,.nav-item.active{background:#ffffff08;border-bottom-color:var(--gold2)}
+.profile{margin-left:auto;display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border-left:1px solid #ffffff28;cursor:pointer}
+.profile img{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--gold2)}
+.profile small{display:block;color:#dce8f1;margin-top:2px}
+
+main{max-width:1500px;margin:auto;padding:20px}
+.page{display:none}.page.active{display:block}
+.dashboard-grid{display:grid;grid-template-columns:240px minmax(0,1fr) 300px;gap:22px}
+.side-panel,.welcome-card,.progress-card,.goal-card,.house-card,.achievement-card,.table-card,.profile-card,.teacher-dashboard,.coming,.stat{
+ background:rgba(255,250,242,.96);border:1px solid var(--line);border-radius:12px;box-shadow:0 3px 10px #432f160b
+}
+.side-panel{padding:14px;align-self:start}
+.side-panel h3{font-size:1rem;margin:4px 8px 10px;letter-spacing:.04em}
+.side-panel>button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:11px 10px;border-radius:8px;font-size:.95rem;cursor:pointer;border-bottom:1px solid #e6dece}
+.side-panel>button:hover,.side-panel .side-active{background:linear-gradient(90deg,#dfeaf3,#f3f7fa)}
+.quote-box{margin-top:20px;padding:14px;border-top:2px solid var(--gold)}
+.quote-box h4{margin:0 0 12px}.quote-box p{font-style:italic;line-height:1.5}.quote-box small{display:block;text-align:right}
+
+.main-column{min-width:0}
+.welcome-card{min-height:250px;display:flex;align-items:center;justify-content:space-between;padding:22px 26px;overflow:hidden}
+.welcome-card h1{font-size:2.4rem;line-height:1.05;margin:0 0 14px;color:var(--navy)}
+.welcome-card p{max-width:520px;line-height:1.55}
+.welcome-card img{width:235px;height:235px;object-fit:contain}
+.welcome-actions{display:flex;gap:10px;flex-wrap:wrap}
+.welcome-actions button,.house-card button,.profile-card button,.coming button{border:1px solid #b98e38;background:linear-gradient(#efd18f,#d8aa50);padding:10px 16px;border-radius:8px;color:#24364b;cursor:pointer;font-weight:700}
+.welcome-actions .secondary{background:linear-gradient(#edf5fa,#dbeaf4);border-color:#aac3d5}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:20px 4px 10px}
+.section-head h2,.section-head h3{margin:0;font-size:1.05rem;letter-spacing:.04em}.section-head button{border:0;background:none;color:var(--navy);cursor:pointer}
+.section-head.compact{margin:0 0 12px}
+
+.topic-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.illustrated-card{min-height:180px;background:linear-gradient(180deg,#fdf9f1,#eef4f8);border:1px solid #cdbfa9;border-radius:12px;padding:16px;text-align:center;cursor:pointer;position:relative;overflow:hidden}
+.illustrated-card:hover{transform:translateY(-2px);box-shadow:0 7px 18px #213a5020}
+.illustrated-card .art{font-size:3.4rem;color:var(--navy);height:85px;display:flex;align-items:center;justify-content:center}
+.illustrated-card h3{margin:4px 0;color:var(--navy)}.illustrated-card p{margin:6px 0;color:var(--muted);font-size:.9rem}
+
+.table-card{overflow:hidden}table{width:100%;border-collapse:collapse}th{background:#dfeaf3;color:var(--navy);text-align:left}th,td{padding:12px 16px;border-bottom:1px solid #e3daca}
+
+.right-column{display:grid;gap:16px;align-content:start}
+.progress-card,.goal-card,.house-card,.achievement-card{padding:18px}
+.progress-row{display:grid;grid-template-columns:85px 1fr 42px;align-items:center;gap:8px;margin:15px 0;font-size:.9rem}
+.bar,.goalbar{height:9px;background:#eee4d2;border:1px solid #d6c7af;border-radius:999px;overflow:hidden}.bar i,.goalbar i{display:block;height:100%;background:linear-gradient(90deg,var(--navy),#4b7598)}
+.goal-card{text-align:center}.goal-card h3,.house-card h3{margin-top:0}.goal-icon{font-size:2.6rem;color:var(--navy)}.goalbar{margin:12px auto;max-width:180px}
+.house-card{text-align:center}.crest{width:72px;height:72px;margin:8px auto;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;background:radial-gradient(circle,#f4db9a,#c99a36);border:3px double #9f7327}
+.mini-badges{display:flex;justify-content:space-around;gap:8px}.mini-badges span{font-size:2rem;text-align:center}.mini-badges small{font-size:.68rem;display:block;margin-top:5px}
+
+.page-title{text-align:center;margin:14px 0 26px}.page-title h1{font-size:2.2rem;margin:0;color:var(--navy)}.page-title p{color:var(--muted)}
+.large-category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1000px;margin:0 auto 30px}
+.large-category-grid button{min-height:130px;border:1px solid var(--line);background:linear-gradient(#fffaf2,#e9f2f8);border-radius:14px;color:var(--navy);cursor:pointer}
+.large-category-grid b{display:block;font-size:1.4rem}.large-category-grid span{display:block;margin-top:8px;color:var(--muted)}
+.topic-section{margin:30px auto;max-width:1200px}.topic-section h2{border-bottom:2px solid var(--gold);padding-bottom:8px}
+.topic-grid,.unit-grid,.badge-grid,.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.topic,.unit,.badge,.stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 3px 10px #00000009}
+.topic,.unit{cursor:pointer}.topic:hover,.unit:hover{border-color:#9fb9cc;transform:translateY(-1px)}.topic small,.unit span{display:block;color:var(--muted);margin-top:6px}
+.unit{min-height:120px;background:linear-gradient(135deg,#fffaf2,#eaf3f8)}
+.badge{text-align:center}.badge .medal{font-size:2.8rem}.badge.locked{filter:grayscale(1);opacity:.5}
+.leaderboard{max-width:760px;margin:auto;display:grid;gap:12px}.rank{display:grid;grid-template-columns:50px 1fr 80px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px}.rank span{width:34px;height:34px;border-radius:50%;background:#dfeaf3;display:grid;place-items:center;font-weight:bold}.rank.first{border-color:#c89c44;background:linear-gradient(90deg,#fffaf2,#fff4cf)}.rank b{text-align:right;font-size:1.4rem}
+.demo-note{text-align:center;color:var(--muted)}
+.stats-grid{max-width:1000px;margin:auto}.stat{text-align:center}.stat b{display:block;font-size:2rem;color:var(--navy)}.stat span{display:block;margin-top:6px;color:var(--muted)}
+.profile-card{display:flex;align-items:center;gap:24px;max-width:700px;margin:auto;padding:24px}.profile-card img{width:180px}
+.teacher-dashboard{max-width:900px;margin:auto;padding:24px}.month-tabs{display:flex;gap:8px;flex-wrap:wrap}.month-tabs button{padding:8px 12px;border:1px solid var(--line);background:#edf4f8;border-radius:8px;cursor:pointer}
+.coming{max-width:650px;margin:50px auto;text-align:center;padding:38px}
+footer{max-width:1500px;margin:20px auto 0;padding:18px 24px;border-top:1px solid #d8cebd;color:var(--muted);display:flex;justify-content:space-between;align-items:center}footer button{border:0;background:none;color:var(--muted);cursor:pointer}
+
+@media(max-width:1100px){
+ .dashboard-grid{grid-template-columns:200px 1fr}.right-column{grid-column:2;grid-template-columns:repeat(2,1fr)}
+ .topic-cards{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+ .banner-wrap{height:120px}.topnav{padding:0 8px}.nav-item span{display:none}.profile div{display:none}
+ .dashboard-grid{grid-template-columns:1fr}.side-panel{display:none}.right-column{grid-column:1;grid-template-columns:1fr}
+ .welcome-card img{width:140px;height:140px}.welcome-card h1{font-size:1.8rem}
+ .topic-cards,.large-category-grid{grid-template-columns:1fr}.profile-card{flex-direction:column}
+}
