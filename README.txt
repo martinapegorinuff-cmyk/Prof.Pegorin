@@ -1,18 +1,22 @@
-PROF. PEGORIN ENGLISH — UNIT 1 PROTOTYPE v0.4
+PROF. PEGORIN ENGLISH — UNIT 1 PROTOTYPE v0.5
 
-Includes:
-- Unit 1 Vocabulary exercise bank
-- Unit 1 Grammar exercise bank
-- one Reading Comprehension
-- Unit 1 Revision exercises
-- difficulty-based House rewards:
-  ★ = 3 points / 3 gems
-  ★★ = 4 points / 4 gems
-  ★★★ = 5 points / 5 gems
-- animated hourglass reward with House-coloured gems
-- demo House selector and local progress storage
+NEW:
+- landing page with Student Login / Teacher Login
+- student profile: name, class, House
+- teacher dashboard with:
+  * overview
+  * students
+  * monthly House Points
+  * school-year House total
+  * exercise results
+  * common-mistakes placeholder
+- teacher prototype code: PEGORIN
+- all Unit 1 exercise content from v0.4 preserved
+- 3/4/5 House Points and animated 3/4/5 gem hourglass preserved
 
 IMPORTANT:
-This is still a static GitHub Pages prototype. Student accounts, private teacher analytics,
-real monthly House totals and cross-device data require a backend/database and authentication.
-Local demo progress is stored only in the browser/device.
+This is still a static GitHub Pages prototype.
+The teacher code is visible in the website files and is NOT secure authentication.
+At the moment, teacher data only includes activity saved in the same browser/device.
+Real student accounts, private teacher-only access, shared cross-device results,
+monthly House totals and common-error analytics require a backend/database + authentication.

@@ -1,4 +1,122 @@
 
+const LOGIN_KEY='pp_current_role';
+const PROFILE_KEY='pp_student_profile';
+
+function showLoginForm(role){
+  document.getElementById('studentLoginForm').classList.toggle('hidden',role!=='student');
+  document.getElementById('teacherLoginForm').classList.toggle('hidden',role!=='teacher');
+}
+function hideLoginForms(){
+  document.getElementById('studentLoginForm').classList.add('hidden');
+  document.getElementById('teacherLoginForm').classList.add('hidden');
+}
+function studentLogin(){
+  const name=(document.getElementById('studentNameInput').value||'').trim();
+  const klass=(document.getElementById('studentClassInput').value||'').trim();
+  const house=document.getElementById('studentHouseInput').value;
+  if(!name){alert('Please enter your name.');return;}
+  const profile={name,klass:klass||'—',house};
+  localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));
+  localStorage.setItem('pp_house',house);
+  localStorage.setItem(LOGIN_KEY,'student');
+  openStudentApp();
+}
+function teacherLogin(){
+  const code=(document.getElementById('teacherCodeInput').value||'').trim().toUpperCase();
+  if(code!=='PEGORIN'){
+    document.getElementById('teacherLoginFeedback').textContent='Incorrect teacher code.';
+    return;
+  }
+  localStorage.setItem(LOGIN_KEY,'teacher');
+  openTeacherApp();
+}
+function logout(){
+  localStorage.removeItem(LOGIN_KEY);
+  document.getElementById('studentApp').classList.add('hidden');
+  document.getElementById('teacherApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  hideLoginForms();
+}
+function openStudentApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('teacherApp').classList.add('hidden');
+  document.getElementById('studentApp').classList.remove('hidden');
+  const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
+  document.getElementById('studentProfileName').textContent=p.name||'Student';
+  document.getElementById('studentProfileMeta').textContent=`${p.klass||'—'} · ${p.house||'Gryffindor'}`;
+  document.getElementById('welcomeStudent').textContent=`Welcome back, ${p.name||'Student'}!`;
+  document.getElementById('studentHouseDisplay').textContent=p.house||'Gryffindor';
+  document.getElementById('housePageTitle').textContent=p.house||'My House';
+  go('home'); refresh();
+}
+function openTeacherApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('studentApp').classList.add('hidden');
+  document.getElementById('teacherApp').classList.remove('hidden');
+  refreshTeacher();
+  teacherMonth('September');
+}
+function teacherSection(id,btn){
+  document.querySelectorAll('.teacher-section').forEach(x=>x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.teacher-tab').forEach(x=>x.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+const MONTH_DEMO={
+  September:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  October:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  November:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  December:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  January:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  February:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  March:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  April:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  May:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0},
+  June:{Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0}
+};
+function teacherMonth(m){
+  let data;
+  if(m==='School Year'){
+    data={Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0};
+    Object.values(MONTH_DEMO).forEach(x=>Object.keys(data).forEach(h=>data[h]+=x[h]||0));
+    const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
+    if(p.house)data[p.house]+=+(localStorage.getItem('pp_housepoints')||0);
+  }else{
+    data={...MONTH_DEMO[m]};
+    const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
+    const now=new Date();
+    const monthName=now.toLocaleString('en',{month:'long'});
+    if(p.house && m===monthName)data[p.house]+=+(localStorage.getItem('pp_housepoints')||0);
+  }
+  document.getElementById('teacherMonthTitle').textContent=`${m} House Points`;
+  document.getElementById('teacherMonthData').innerHTML=Object.entries(data).map(([h,v])=>`<tr><td>${h}</td><td><b>${v}</b></td></tr>`).join('');
+}
+function refreshTeacher(){
+  const profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');
+  const results=JSON.parse(localStorage.getItem('pp_results')||'{}');
+  const vals=Object.values(results);
+  const avg=vals.length?Math.round(vals.reduce((a,b)=>a+(b.pct||0),0)/vals.length):null;
+  const hp=+(localStorage.getItem('pp_housepoints')||0);
+
+  document.getElementById('teacherStudentsCount').textContent=profile.name?1:0;
+  document.getElementById('teacherAttemptsCount').textContent=vals.length;
+  document.getElementById('teacherAvgScore').textContent=avg===null?'—':avg+'%';
+  document.getElementById('teacherLocalPoints').textContent=hp;
+
+  document.getElementById('teacherRecentActivity').innerHTML=vals.length
+    ? vals.slice(-5).reverse().map(r=>`<p><b>${profile.name||'Student'}</b> · ${r.title} · ${r.pct}% · +${r.points||0}</p>`).join('')
+    : '<p>No activity saved on this browser yet.</p>';
+
+  document.getElementById('teacherStudentsTable').innerHTML=profile.name
+    ? `<tr><td>${profile.name}</td><td>${profile.klass||'—'}</td><td>${profile.house||'—'}</td><td>${vals.length}</td><td>${avg===null?'—':avg+'%'}</td></tr>`
+    : '<tr><td colspan="5">No student profile saved on this browser yet.</td></tr>';
+
+  document.getElementById('teacherResultsTable').innerHTML=vals.length
+    ? vals.map(r=>`<tr><td>${profile.name||'Student'}</td><td>${r.title}</td><td>${r.score}/${r.total} (${r.pct}%)</td><td>${r.date||'—'}</td><td>+${r.points||0}</td></tr>`).join('')
+    : '<tr><td colspan="5">No exercise results saved yet.</td></tr>';
+}
+
+
 const DB=window.EXERCISES;
 const norm=s=>String(s??'').toLowerCase().trim().replace(/[.!?]/g,'').replace(/[’]/g,"'").replace(/\s+/g,' ');
 function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');window.scrollTo(0,0);refresh();}
@@ -61,7 +179,7 @@ function completedBefore(id){let r=JSON.parse(localStorage.getItem('pp_awarded')
 function saveResult(id,obj){let r=JSON.parse(localStorage.getItem('pp_results')||'{}');r[id]=obj;localStorage.setItem('pp_results',JSON.stringify(r))}
 function award(points){
  let hp=+(localStorage.getItem('pp_housepoints')||0);hp+=points;localStorage.setItem('pp_housepoints',hp);
- const house=document.getElementById('houseSelect')?.value||localStorage.getItem('pp_house')||'Gryffindor';localStorage.setItem('pp_house',house);
+ const profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');const house=profile.house||localStorage.getItem('pp_house')||'Gryffindor';localStorage.setItem('pp_house',house);
  const colors={Gryffindor:'#a6202b',Slytherin:'#26734a',Ravenclaw:'#27659a',Hufflepuff:'#e2b72f'};
  document.documentElement.style.setProperty('--gem',colors[house]);
  document.getElementById('rewardTitle').textContent=`+${points} House Points!`;
@@ -76,5 +194,15 @@ function refresh(){
  ['housePoints','housePoints2'].forEach(id=>{let x=document.getElementById(id);if(x)x.textContent=hp});let dc=document.getElementById('doneCount');if(dc)dc.textContent=Object.keys(results).length;
  let rb=document.getElementById('resultsBox');if(rb)rb.innerHTML=Object.values(results).length?Object.values(results).map(r=>`<p><b>${r.title}</b> — ${r.score}/${r.total} (${r.pct}%)</p>`).join(''):'<p>No exercises completed yet.</p>';
 }
-document.addEventListener('change',e=>{if(e.target.id==='houseSelect')localStorage.setItem('pp_house',e.target.value)});
-document.addEventListener('DOMContentLoaded',()=>{let h=localStorage.getItem('pp_house');if(h&&document.getElementById('houseSelect'))document.getElementById('houseSelect').value=h;refresh()});
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const role=localStorage.getItem(LOGIN_KEY);
+  if(role==='student' && localStorage.getItem(PROFILE_KEY)) openStudentApp();
+  else if(role==='teacher') openTeacherApp();
+  else {
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('studentApp').classList.add('hidden');
+    document.getElementById('teacherApp').classList.add('hidden');
+  }
+});

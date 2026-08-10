@@ -1,19 +1,276 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prof. Pegorin English</title><link rel="stylesheet" href="style.css"></head><body>
-<header class="site-header"><div class="banner-wrap"><img src="assets/banner.png" class="banner" alt="Prof. Pegorin"></div>
-<nav class="topnav"><button onclick="go('home')" class="nav-item active">⌂ <span>HOME</span></button><button onclick="go('topics')" class="nav-item">✦ <span>PRACTICE BY TOPIC</span></button><button onclick="go('units')" class="nav-item">▦ <span>PRACTICE BY UNIT</span></button><button onclick="go('badges')" class="nav-item">★ <span>BADGES</span></button><button onclick="go('houses')" class="nav-item">♛ <span>HOUSE POINTS</span></button><button onclick="go('progress')" class="nav-item">▥ <span>MY PROGRESS</span></button><div class="profile"><div><b>Student Demo</b><small>Gryffindor · Demo</small></div></div></nav></header>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prof. Pegorin English</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section id="loginScreen" class="login-screen">
+  <div class="login-banner"><img src="assets/banner.png" alt="Prof. Pegorin English"></div>
+  <div class="login-panel">
+    <div class="login-intro">
+      <h1>Welcome to Prof. Pegorin English</h1>
+      <p>Choose how you want to enter.</p>
+    </div>
+
+    <div class="login-choice-grid">
+      <button class="login-choice student-choice" onclick="showLoginForm('student')">
+        <div class="login-icon">✦</div>
+        <h2>Student Login</h2>
+        <p>Practise, earn badges and collect House Points.</p>
+      </button>
+
+      <button class="login-choice teacher-choice" onclick="showLoginForm('teacher')">
+        <div class="login-icon">♛</div>
+        <h2>Teacher Login</h2>
+        <p>View students, results, House Points and class trends.</p>
+      </button>
+    </div>
+
+    <div id="studentLoginForm" class="login-form hidden">
+      <button class="tiny-back" onclick="hideLoginForms()">← Back</button>
+      <h2>Student Login</h2>
+      <label>Name
+        <input id="studentNameInput" type="text" placeholder="Your name">
+      </label>
+      <label>Class
+        <input id="studentClassInput" type="text" placeholder="e.g. 1A">
+      </label>
+      <label>House
+        <select id="studentHouseInput">
+          <option>Gryffindor</option>
+          <option>Slytherin</option>
+          <option>Ravenclaw</option>
+          <option>Hufflepuff</option>
+        </select>
+      </label>
+      <button class="login-submit" onclick="studentLogin()">Enter student area</button>
+      <small>This prototype saves your profile on this device.</small>
+    </div>
+
+    <div id="teacherLoginForm" class="login-form hidden">
+      <button class="tiny-back" onclick="hideLoginForms()">← Back</button>
+      <h2>Teacher Login</h2>
+      <label>Teacher name
+        <input id="teacherNameInput" type="text" value="Prof. Pegorin">
+      </label>
+      <label>Teacher code
+        <input id="teacherCodeInput" type="password" placeholder="Enter teacher code">
+      </label>
+      <button class="login-submit" onclick="teacherLogin()">Enter teacher area</button>
+      <div id="teacherLoginFeedback" class="login-feedback"></div>
+      <small>Prototype code: <b>PEGORIN</b>. This is not secure authentication yet.</small>
+    </div>
+  </div>
+</section>
+
+<div id="studentApp" class="hidden">
+<header class="site-header">
+  <div class="banner-wrap"><img src="assets/banner.png" class="banner" alt="Prof. Pegorin"></div>
+  <nav class="topnav">
+    <button onclick="go('home')" class="nav-item active">⌂ <span>HOME</span></button>
+    <button onclick="go('topics')" class="nav-item">✦ <span>PRACTICE BY TOPIC</span></button>
+    <button onclick="go('units')" class="nav-item">▦ <span>PRACTICE BY UNIT</span></button>
+    <button onclick="go('badges')" class="nav-item">★ <span>BADGES</span></button>
+    <button onclick="go('houses')" class="nav-item">♛ <span>HOUSE POINTS</span></button>
+    <button onclick="go('progress')" class="nav-item">▥ <span>MY PROGRESS</span></button>
+    <div class="profile">
+      <div><b id="studentProfileName">Student</b><small id="studentProfileMeta">House</small></div>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+</header>
+
 <main>
-<section id="home" class="page active"><div class="dashboard-grid"><aside class="side-panel"><h3>STUDENT AREA</h3><button onclick="go('home')">⌂ My Dashboard</button><button onclick="go('topics')">✦ Practice by Topic</button><button onclick="go('units')">▦ Practice by Unit</button><button onclick="go('progress')">▥ My Results</button><button onclick="go('badges')">★ Badges & Achievements</button><button onclick="go('houses')">♛ My House</button><div class="quote-box"><h4>KEEP GOING!</h4><p>Every exercise helps your House.</p></div></aside>
-<div class="main-column"><div class="welcome-card"><div class="welcome-text"><h1>Welcome back!</h1><p>Choose what you want to practise today.</p><div class="welcome-actions"><button onclick="go('topics')">Practice by Topic</button><button class="secondary" onclick="go('units')">Practice by Unit</button></div></div><img src="assets/teacher.png" alt=""></div>
-<div class="section-head"><h2>UNIT 1 PRACTICE</h2></div><div class="topic-cards"><article onclick="showCategory('Vocabulary')" class="illustrated-card"><div class="art">Aa</div><h3>VOCABULARY</h3><p>Countries & nationalities</p></article><article onclick="showCategory('Grammar')" class="illustrated-card"><div class="art">⌘</div><h3>GRAMMAR</h3><p>Pronouns · be · questions · possessives</p></article><article onclick="showCategory('Reading Comprehension')" class="illustrated-card"><div class="art">▤</div><h3>READING</h3><p>An international class</p></article><article onclick="showCategory('Revision')" class="illustrated-card"><div class="art">✦</div><h3>REVISION</h3><p>Mixed Unit 1 practice</p></article></div></div>
-<aside class="right-column"><div class="progress-card"><h3>YOUR PROGRESS</h3><p><b id="doneCount">0</b> exercises completed on this device.</p></div><div class="house-card"><h3>MY HOUSE</h3><div class="crest">♛</div><select id="houseSelect"><option>Gryffindor</option><option>Slytherin</option><option>Ravenclaw</option><option>Hufflepuff</option></select><p>Demo points: <b id="housePoints">0</b></p></div></aside></div></section>
-<section id="topics" class="page"><div class="page-title"><h1>Practice by Topic</h1><p>Choose a section.</p></div><div class="large-category-grid"><button onclick="showCategory('Vocabulary')"><b>VOCABULARY</b></button><button onclick="showCategory('Grammar')"><b>GRAMMAR</b></button><button onclick="showCategory('Reading Comprehension')"><b>READING</b></button><button onclick="showCategory('Revision')"><b>REVISION</b></button></div><div id="topicList"></div></section>
-<section id="units" class="page"><div class="page-title"><h1>Practice by Unit</h1><p>Unit 1</p></div><div class="unit-grid"><div class="unit" onclick="showUnit1()"><b>Unit 1</b><span>Vocabulary · Grammar · Reading · Revision</span></div></div><div id="unitDetail"></div></section>
+<section id="home" class="page active">
+  <div class="dashboard-grid">
+    <aside class="side-panel">
+      <h3>STUDENT AREA</h3>
+      <button onclick="go('home')">⌂ My Dashboard</button>
+      <button onclick="go('topics')">✦ Practice by Topic</button>
+      <button onclick="go('units')">▦ Practice by Unit</button>
+      <button onclick="go('progress')">▥ My Results</button>
+      <button onclick="go('badges')">★ Badges & Achievements</button>
+      <button onclick="go('houses')">♛ My House</button>
+      <div class="quote-box"><h4>KEEP GOING!</h4><p>Every exercise helps your House.</p></div>
+    </aside>
+
+    <div class="main-column">
+      <div class="welcome-card">
+        <div class="welcome-text">
+          <h1 id="welcomeStudent">Welcome back!</h1>
+          <p>Choose what you want to practise today.</p>
+          <div class="welcome-actions">
+            <button onclick="go('topics')">Practice by Topic</button>
+            <button class="secondary" onclick="go('units')">Practice by Unit</button>
+          </div>
+        </div>
+        <img src="assets/teacher.png" alt="">
+      </div>
+
+      <div class="section-head"><h2>UNIT 1 PRACTICE</h2></div>
+      <div class="topic-cards">
+        <article onclick="showCategory('Vocabulary')" class="illustrated-card"><div class="art">Aa</div><h3>VOCABULARY</h3><p>Countries & nationalities</p></article>
+        <article onclick="showCategory('Grammar')" class="illustrated-card"><div class="art">⌘</div><h3>GRAMMAR</h3><p>Pronouns · be · questions · possessives</p></article>
+        <article onclick="showCategory('Reading Comprehension')" class="illustrated-card"><div class="art">▤</div><h3>READING</h3><p>An international class</p></article>
+        <article onclick="showCategory('Revision')" class="illustrated-card"><div class="art">✦</div><h3>REVISION</h3><p>Mixed Unit 1 practice</p></article>
+      </div>
+    </div>
+
+    <aside class="right-column">
+      <div class="progress-card">
+        <h3>YOUR PROGRESS</h3>
+        <p><b id="doneCount">0</b> exercises completed on this device.</p>
+      </div>
+      <div class="house-card">
+        <h3>MY HOUSE</h3>
+        <div class="crest">♛</div>
+        <h2 id="studentHouseDisplay">Gryffindor</h2>
+        <p>House Points earned here: <b id="housePoints">0</b></p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="topics" class="page">
+  <div class="page-title"><h1>Practice by Topic</h1><p>Choose a section.</p></div>
+  <div class="large-category-grid">
+    <button onclick="showCategory('Vocabulary')"><b>VOCABULARY</b></button>
+    <button onclick="showCategory('Grammar')"><b>GRAMMAR</b></button>
+    <button onclick="showCategory('Reading Comprehension')"><b>READING</b></button>
+    <button onclick="showCategory('Revision')"><b>REVISION</b></button>
+  </div>
+  <div id="topicList"></div>
+</section>
+
+<section id="units" class="page">
+  <div class="page-title"><h1>Practice by Unit</h1><p>Unit 1</p></div>
+  <div class="unit-grid"><div class="unit" onclick="showUnit1()"><b>Unit 1</b><span>Vocabulary · Grammar · Reading · Revision</span></div></div>
+  <div id="unitDetail"></div>
+</section>
+
 <section id="exercise" class="page"><div id="exerciseBox"></div></section>
-<section id="badges" class="page"><div class="page-title"><h1>Badges & Achievements</h1><p>Coming as the site grows.</p></div></section>
-<section id="houses" class="page"><div class="page-title"><h1>House Points</h1><p>★ = 3 points · ★★ = 4 points · ★★★ = 5 points</p></div><div class="coming"><h2>House scoring demo</h2><p>Your local demo total is <b id="housePoints2">0</b> points.</p></div></section>
-<section id="progress" class="page"><div class="page-title"><h1>My Progress</h1><p>Results are stored locally in this prototype.</p></div><div id="resultsBox" class="coming"></div></section>
+
+<section id="badges" class="page">
+  <div class="page-title"><h1>Badges & Achievements</h1><p>Coming as the site grows.</p></div>
+</section>
+
+<section id="houses" class="page">
+  <div class="page-title"><h1>House Points</h1><p>★ = 3 points · ★★ = 4 points · ★★★ = 5 points</p></div>
+  <div class="coming">
+    <h2 id="housePageTitle">My House</h2>
+    <p>You have earned <b id="housePoints2">0</b> points for your House on this device.</p>
+  </div>
+</section>
+
+<section id="progress" class="page">
+  <div class="page-title"><h1>My Progress</h1><p>Your results on this device.</p></div>
+  <div id="resultsBox" class="coming"></div>
+</section>
 </main>
-<div id="rewardOverlay" class="reward-overlay"><div class="reward-card"><h2 id="rewardTitle">+5 House Points!</h2><div class="hourglass"><div class="glass top"></div><div id="gems" class="gems"></div><div class="glass bottom"></div></div><p id="rewardText"></p><button onclick="closeReward()">Continue</button></div></div>
-<footer><span>Prof. Pegorin English · Unit 1 prototype v0.4</span></footer>
-<script src="exercises.js"></script><script src="app.js"></script></body></html>
+
+<div id="rewardOverlay" class="reward-overlay">
+  <div class="reward-card">
+    <h2 id="rewardTitle">+5 House Points!</h2>
+    <div class="hourglass"><div class="glass top"></div><div id="gems" class="gems"></div><div class="glass bottom"></div></div>
+    <p id="rewardText"></p>
+    <button onclick="closeReward()">Continue</button>
+  </div>
+</div>
+
+<footer><span>Prof. Pegorin English · Unit 1 prototype v0.5</span></footer>
+</div>
+
+<div id="teacherApp" class="hidden">
+<header class="teacher-header">
+  <div>
+    <h1>Prof. Pegorin English</h1>
+    <p>Teacher Dashboard</p>
+  </div>
+  <button class="logout-btn teacher-logout" onclick="logout()">Log out</button>
+</header>
+
+<main class="teacher-main">
+  <div class="teacher-dashboard-grid">
+    <aside class="teacher-sidebar">
+      <h3>TEACHER AREA</h3>
+      <button class="teacher-tab active" onclick="teacherSection('overview',this)">⌂ Overview</button>
+      <button class="teacher-tab" onclick="teacherSection('students',this)">♙ Students</button>
+      <button class="teacher-tab" onclick="teacherSection('housesTeacher',this)">♛ House Points</button>
+      <button class="teacher-tab" onclick="teacherSection('resultsTeacher',this)">▥ Exercise Results</button>
+      <button class="teacher-tab" onclick="teacherSection('mistakesTeacher',this)">⚠ Common Mistakes</button>
+    </aside>
+
+    <section class="teacher-content">
+      <div id="overview" class="teacher-section active">
+        <div class="teacher-title"><h2>Class Overview</h2><p>Prototype data + any activity saved on this browser.</p></div>
+        <div class="teacher-stat-grid">
+          <div class="teacher-stat"><b id="teacherStudentsCount">1</b><span>Students seen</span></div>
+          <div class="teacher-stat"><b id="teacherAttemptsCount">0</b><span>Exercises completed</span></div>
+          <div class="teacher-stat"><b id="teacherAvgScore">—</b><span>Average score</span></div>
+          <div class="teacher-stat"><b id="teacherLocalPoints">0</b><span>House Points logged</span></div>
+        </div>
+        <div class="teacher-card">
+          <h3>Recent activity</h3>
+          <div id="teacherRecentActivity"></div>
+        </div>
+      </div>
+
+      <div id="students" class="teacher-section">
+        <div class="teacher-title"><h2>Students</h2><p>Student profiles visible on this browser in the prototype.</p></div>
+        <div class="teacher-card">
+          <table>
+            <thead><tr><th>Name</th><th>Class</th><th>House</th><th>Completed</th><th>Average</th></tr></thead>
+            <tbody id="teacherStudentsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="housesTeacher" class="teacher-section">
+        <div class="teacher-title"><h2>House Points</h2><p>Monthly view for the school year.</p></div>
+        <div class="month-tabs">
+          <button onclick="teacherMonth('September')">September</button>
+          <button onclick="teacherMonth('October')">October</button>
+          <button onclick="teacherMonth('November')">November</button>
+          <button onclick="teacherMonth('December')">December</button>
+          <button onclick="teacherMonth('January')">January</button>
+          <button onclick="teacherMonth('February')">February</button>
+          <button onclick="teacherMonth('March')">March</button>
+          <button onclick="teacherMonth('April')">April</button>
+          <button onclick="teacherMonth('May')">May</button>
+          <button onclick="teacherMonth('June')">June</button>
+          <button onclick="teacherMonth('School Year')">School Year</button>
+        </div>
+        <div class="teacher-card">
+          <h3 id="teacherMonthTitle">September House Points</h3>
+          <table><thead><tr><th>House</th><th>Points</th></tr></thead><tbody id="teacherMonthData"></tbody></table>
+        </div>
+      </div>
+
+      <div id="resultsTeacher" class="teacher-section">
+        <div class="teacher-title"><h2>Exercise Results</h2><p>See exercise attempts and scores.</p></div>
+        <div class="teacher-card">
+          <table><thead><tr><th>Student</th><th>Exercise</th><th>Score</th><th>Date</th><th>House Points</th></tr></thead><tbody id="teacherResultsTable"></tbody></table>
+        </div>
+      </div>
+
+      <div id="mistakesTeacher" class="teacher-section">
+        <div class="teacher-title"><h2>Common Mistakes</h2><p>This area is ready for aggregated error analytics.</p></div>
+        <div class="teacher-card">
+          <div id="teacherMistakesList">
+            <p>No central error database yet. Once real accounts and a database are connected, this page will rank the most frequently missed exercises and items.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+
+<script src="exercises.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
