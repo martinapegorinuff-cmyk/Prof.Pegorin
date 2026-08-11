@@ -570,3 +570,20 @@ body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:
  .distance-demo{height:80px}
  .distance-demo .object{font-size:2rem}
 }
+
+/* ===== v1.1 student account flow ===== */
+.student-auth-tabs{display:flex;gap:8px;margin:0 0 18px}
+.auth-tab{flex:1;padding:10px 14px;border:1px solid #baa47a;border-radius:8px;background:#eee7d7;color:#18344f;font-family:inherit;font-weight:700;cursor:pointer}
+.auth-tab.active{background:#18344f;color:#f7e8b7;border-color:#18344f}
+.remember-row{display:flex!important;flex-direction:row!important;align-items:center;gap:9px;margin:8px 0 14px}
+.remember-row input{width:auto!important}
+.registration-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.registration-email{grid-column:1/-1}
+.registration-success{padding:14px 0}
+.credential-card{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;padding:16px;margin:14px 0;border:1px solid #b99c61;border-radius:10px;background:#fff9e9}
+.credential-card span{color:#695d49}
+.credential-card b{font-family:monospace;font-size:1.05rem;color:#18344f}
+.email-status{font-size:.9rem;color:#695d49}
+.danger-btn{background:#7c2f2f!important;color:#fff!important;border-color:#7c2f2f!important}
+.banned-note{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:5px;background:#7c2f2f;color:#fff;font-size:.7rem;font-weight:bold}
+@media(max-width:720px){.registration-grid{grid-template-columns:1fr}.registration-email{grid-column:auto}}

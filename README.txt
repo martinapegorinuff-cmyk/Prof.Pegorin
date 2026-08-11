@@ -84,3 +84,13 @@ v1.0.5
 - Replaced Unit 2 V3 with the approved 14-person appearance board; figures 1 and 2 are full-body with height scales.
 - Updated V2 to the 12 approved family-relationship sentences.
 - Back buttons now follow the student's actual internal navigation history instead of returning to a fixed page.
+
+v1.1.0
+- Added first-time student registration: first name, last name, class, House dropdown and email.
+- User ID is generated as First name + Last name.
+- Password is generated from first 3 letters of first/last name + dot + 2-digit number; 67 and 69 are excluded.
+- Added User ID/password login and Remember me.
+- Student registration data and House are read-only from the student side.
+- Teacher area supports multiple locally registered users: Change House, Remove Points, Ban/Unban and Delete User.
+- Exercise results, attempts and House Points are stored separately per registered account.
+IMPORTANT: GitHub Pages is static. Automatic email sending is not active in this prototype; credentials are shown after registration. Real email delivery and secure authentication require a backend/email service.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prof. Pegorin English</title>
-<link rel="stylesheet" href="style.css?v=106">
+<link rel="stylesheet" href="style.css?v=110">
 </head>
 <body>
 
@@ -30,28 +30,75 @@
       </button>
     </div>
 
-    <div id="studentLoginForm" class="login-form hidden">
-      <button class="tiny-back" onclick="hideLoginForms()">← Back</button>
-      <h2>Student Login</h2>
-      <label>Name
-        <input id="studentNameInput" type="text" placeholder="Your name">
+    
+<div id="studentLoginForm" class="login-form hidden">
+  <button class="tiny-back" onclick="hideLoginForms()">← Back</button>
+
+  <div class="student-auth-tabs">
+    <button id="studentLoginTab" class="auth-tab active" onclick="showStudentAuth('login')">Log in</button>
+    <button id="studentRegisterTab" class="auth-tab" onclick="showStudentAuth('register')">Register</button>
+  </div>
+
+  <div id="studentLoginPane">
+    <h2>Student Login</h2>
+    <label>User ID
+      <input id="studentUserIdInput" type="text" autocomplete="username" placeholder="e.g. Martina Pegorin">
+    </label>
+    <label>Password
+      <input id="studentPasswordInput" type="password" autocomplete="current-password" placeholder="Your password">
+    </label>
+    <label class="remember-row">
+      <input id="studentRememberInput" type="checkbox">
+      <span>Remember me on this device</span>
+    </label>
+    <button class="login-submit" onclick="studentLogin()">Log in</button>
+    <div id="studentLoginFeedback" class="login-feedback"></div>
+    <small>First time here? Choose <b>Register</b> above.</small>
+  </div>
+
+  <div id="studentRegisterPane" class="hidden">
+    <h2>Student Registration</h2>
+    <div class="registration-grid">
+      <label>First name
+        <input id="regFirstName" type="text" autocomplete="given-name">
+      </label>
+      <label>Last name
+        <input id="regLastName" type="text" autocomplete="family-name">
       </label>
       <label>Class
-        <input id="studentClassInput" type="text" placeholder="e.g. 1A">
+        <input id="regClass" type="text" placeholder="e.g. 1A">
       </label>
       <label>House
-        <select id="studentHouseInput">
+        <select id="regHouse">
+          <option value="" selected disabled>Choose your House</option>
           <option>Gryffindor</option>
           <option>Slytherin</option>
           <option>Ravenclaw</option>
           <option>Hufflepuff</option>
         </select>
       </label>
-      <button class="login-submit" onclick="studentLogin()">Enter student area</button>
-      <small>This prototype saves your profile on this device.</small>
+      <label class="registration-email">Email
+        <input id="regEmail" type="email" autocomplete="email" placeholder="name@example.com">
+      </label>
     </div>
+    <button class="login-submit" onclick="registerStudent()">Register</button>
+    <div id="registrationFeedback" class="login-feedback"></div>
+    <small>After registration, these details and your House cannot be changed by the student.</small>
+  </div>
 
-    <div id="teacherLoginForm" class="login-form hidden">
+  <div id="registrationSuccess" class="registration-success hidden">
+    <h2>Registration complete</h2>
+    <p>Your credentials have been created.</p>
+    <div class="credential-card">
+      <span>User ID</span><b id="generatedUserId"></b>
+      <span>Password</span><b id="generatedPassword"></b>
+    </div>
+    <p id="registrationEmailStatus" class="email-status"></p>
+    <button class="login-submit" onclick="useGeneratedLogin()">Go to login</button>
+  </div>
+</div>
+
+<div id="teacherLoginForm" class="login-form hidden">
       <button class="tiny-back" onclick="hideLoginForms()">← Back</button>
       <h2>Teacher Login</h2>
       <label>Teacher name
@@ -196,7 +243,7 @@
   </div>
 </div>
 
-<footer><span>Prof. Pegorin English · Units 1–2 prototype v1.0.6</span></footer>
+<footer><span>Prof. Pegorin English · Units 1–2 prototype v1.1.0</span></footer>
 </div>
 
 <div id="teacherApp" class="hidden">
@@ -235,10 +282,10 @@
       </div>
 
       <div id="students" class="teacher-section">
-        <div class="teacher-title"><h2>Students</h2><p>Student profiles visible on this browser in the prototype.</p></div>
+        <div class="teacher-title"><h2>Students</h2><p>Registered student accounts stored in this browser prototype.</p></div>
         <div class="teacher-card">
           <table>
-            <thead><tr><th>Name</th><th>Class</th><th>House</th><th>Completed</th><th>Average</th><th>Admin</th></tr></thead>
+            <thead><tr><th>Name</th><th>User ID</th><th>Class</th><th>House</th><th>Email</th><th>Completed</th><th>Average</th><th>Admin</th></tr></thead>
             <tbody id="teacherStudentsTable"></tbody>
           </table>
         </div>
@@ -285,8 +332,8 @@
 </main>
 </div>
 
-<script src="exercises.js?v=106"></script>
+<script src="exercises.js?v=110"></script>
 <div id="studentWatermark" class="watermark hidden"></div>
-<script src="app.js?v=106"></script>
+<script src="app.js?v=110"></script>
 </body>
 </html>
