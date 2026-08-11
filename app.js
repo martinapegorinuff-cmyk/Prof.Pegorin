@@ -32,6 +32,7 @@ function teacherLogin(){
   openTeacherApp();
 }
 function logout(){
+  PAGE_HISTORY.length=0;
   localStorage.removeItem(LOGIN_KEY);
   document.getElementById('studentApp').classList.add('hidden');
   document.getElementById('teacherApp').classList.add('hidden');
@@ -39,6 +40,7 @@ function logout(){
   hideLoginForms();
 }
 function openStudentApp(){
+  PAGE_HISTORY.length=0;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('teacherApp').classList.add('hidden');
   document.getElementById('studentApp').classList.remove('hidden');
@@ -120,7 +122,20 @@ function refreshTeacher(){
 
 const DB=window.EXERCISES;
 const norm=s=>String(s??'').toLowerCase().trim().replace(/[.!?]/g,'').replace(/[’]/g,"'").replace(/\s+/g,' ');
-function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');window.scrollTo(0,0);refresh();}
+const PAGE_HISTORY=[];
+function activePageId(){return document.querySelector('.page.active')?.id||null}
+function go(id,record=true){
+ const current=activePageId();
+ if(record && current && current!==id) PAGE_HISTORY.push(current);
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id)?.classList.add('active');
+ window.scrollTo(0,0);refresh();
+}
+function navBack(){
+ const previous=PAGE_HISTORY.pop();
+ if(previous){go(previous,false);return;}
+ go('home',false);
+}
 function stars(n){return '★'.repeat(n)}
 function allExercises(){return Object.entries(DB).flatMap(([cat,arr])=>arr.map(e=>({...e,unit:e.unit||1,cat})))}
 function showCategory(cat){
@@ -154,7 +169,7 @@ function openExercise(cat,id){
  go('exercise'); renderExercise(e,cat);
 }
 function renderExercise(e,cat){
- let h=`<div class="exercise-shell"><button class="backbtn" onclick="showCategory('${cat}')">← Back</button>
+ let h=`<div class="exercise-shell"><button class="backbtn" onclick="navBack()">← Back</button>
  <div class="exercise-head"><div><small>Unit ${e.unit||1} · ${cat}</small><h1>${e.title}</h1></div>
  <div class="difficulty">${stars(e.stars)}<span>${e.points} House Points</span></div></div>`;
  if(e.instructions)h+=`<p class="exercise-instructions">${e.instructions}</p>`;

@@ -78,3 +78,9 @@ v1.0.3
 - V3 uses the final 14-picture board only
 - V3/V4/V5/V6 and Revision prompts updated to match pictures 1–14
 - removed all references to discarded V3 images
+
+v1.0.5
+- Replaced Unit 2 V2 with the approved corrected 9-person family tree.
+- Replaced Unit 2 V3 with the approved 14-person appearance board; figures 1 and 2 are full-body with height scales.
+- Updated V2 to the 12 approved family-relationship sentences.
+- Back buttons now follow the student's actual internal navigation history instead of returning to a fixed page.
