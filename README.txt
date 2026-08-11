@@ -55,3 +55,17 @@ v1.0.0 — UNIT 2
 - approved V1/V2/V3 artwork reused to avoid unnecessary image proliferation
 - visual demonstrative exercises rendered in HTML/CSS
 - all existing login, teacher/admin, House Points, attempts, anti-copy and watermark functions preserved
+
+v1.0.1
+- V1: added missing no. 3 (parents)
+- V2: corrected all names so they sit inside their parchment labels
+- V3: all 16 illustrations are now numbered and used
+- V3/V4/V5/V6/Revision references updated to match the corrected 1–16 numbering
+
+
+v1.0.2
+- Installed final approved Unit 2 V1/V2/V3 artwork.
+- V3 reduced to the definitive 14 numbered figures only.
+- Re-aligned every Unit 2 prompt that refers to V1/V2/V3.
+- Removed all references to obsolete V3 pictures 15 and 16.
+- Checked Vocabulary challenge distractors and Unit 2 Revision image references.
