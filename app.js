@@ -171,9 +171,10 @@ function checkExercise(){
  }
  let pct=Math.round(correct/total*100);
  document.getElementById('feedback').innerHTML=`<div class="scorebox"><h2>${correct}/${total} · ${pct}%</h2><p>${pct>=85?'Excellent!':pct>=60?'Well done!':'Good try! Check your answers and try again.'}</p></div>`;
- saveResult(e.id,{title:e.title,score:correct,total,pct,points:e.points,cat:e.cat,date:new Date().toLocaleDateString()});
- if(!completedBefore(e.id)) award(e.points);
- else refresh();
+ let at=attempts(); at[e.id]=(at[e.id]||0)+1; localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(at));
+ let earned=at[e.id]===1?e.points:(at[e.id]<=3?1:0);
+ saveResult(e.id,{title:e.title,score:correct,total,pct,points:earned,cat:e.cat,date:new Date().toLocaleDateString(),attempt:at[e.id]});
+ if(earned>0) award(earned); else refresh();
 }
 function completedBefore(id){let r=JSON.parse(localStorage.getItem('pp_awarded')||'{}');if(r[id])return true;r[id]=true;localStorage.setItem('pp_awarded',JSON.stringify(r));return false}
 function saveResult(id,obj){let r=JSON.parse(localStorage.getItem('pp_results')||'{}');r[id]=obj;localStorage.setItem('pp_results',JSON.stringify(r))}
@@ -206,3 +207,36 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('teacherApp').classList.add('hidden');
   }
 });
+
+/* ===== v0.6 engagement/admin/protection ===== */
+const ATTEMPTS_KEY='pp_attempts', BANNED_KEY='pp_banned';
+function attempts(){return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}')}
+function badgeData(){
+ const rs=Object.values(JSON.parse(localStorage.getItem('pp_results')||'{}'));
+ const perfect=rs.filter(r=>r.pct===100).length;
+ const perfect3=rs.filter(r=>r.pct===100 && r.points===5).length;
+ const cats={}; rs.forEach(r=>{if(r.pct===100)cats[r.cat]=(cats[r.cat]||0)+1});
+ return [
+  ['Perfect Start','Perfect score in 1 exercise',perfect>=1],['Perfect Five','Perfect score in 5 exercises',perfect>=5],['Perfect Ten','Perfect score in 10 exercises',perfect>=10],
+  ['Challenge Master','Perfect score in 20 three-star exercises',perfect3>=20],
+  ['Unit 1 · Vocabulary Explorer','Perfect score in a Unit 1 Vocabulary exercise',(cats.Vocabulary||0)>=1],
+  ['Unit 1 · Grammar Master','Perfect score in a Unit 1 Grammar exercise',(cats.Grammar||0)>=1],
+  ['Unit 1 · Reading Explorer','Perfect score in the Unit 1 Reading exercise',(cats['Reading Comprehension']||0)>=1],
+  ['Unit 1 · Revision Master','Perfect score in a Unit 1 Revision exercise',(cats.Revision||0)>=1]
+ ];
+}
+function renderBadges(){const x=document.getElementById('badgeGrid');if(!x)return;x.innerHTML=badgeData().map(b=>`<div class="badge ${b[2]?'unlocked':'locked'}"><div class="medal">${b[2]?'★':'☆'}</div><h3>${b[0]}</h3><p>${b[1]}</p><b>${b[2]?'Unlocked':'Locked'}</b></div>`).join('')}
+const oldRefresh=refresh;refresh=function(){oldRefresh();renderBadges();}
+function adminChangeHouse(){const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');const h=prompt('New House: Gryffindor, Slytherin, Ravenclaw or Hufflepuff',p.house||'');if(!['Gryffindor','Slytherin','Ravenclaw','Hufflepuff'].includes(h))return;p.house=h;localStorage.setItem(PROFILE_KEY,JSON.stringify(p));localStorage.setItem('pp_house',h);refreshTeacher()}
+function adminRemovePoints(){let hp=+(localStorage.getItem('pp_housepoints')||0);let n=+(prompt('How many House Points do you want to remove?','1')||0);if(n>0)localStorage.setItem('pp_housepoints',Math.max(0,hp-n));refreshTeacher()}
+function adminToggleBan(){let b=localStorage.getItem(BANNED_KEY)==='1';localStorage.setItem(BANNED_KEY,b?'0':'1');refreshTeacher()}
+const oldOpenStudent=openStudentApp;openStudentApp=function(){if(localStorage.getItem(BANNED_KEY)==='1'){alert('This student account has been disabled by the teacher.');logout();return;}oldOpenStudent();document.body.classList.add('student-mode');const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');let w=document.getElementById('studentWatermark');w.textContent=`${p.name||'Student'} · ${p.klass||''}`;w.classList.remove('hidden')}
+const oldOpenTeacher=openTeacherApp;openTeacherApp=function(){document.body.classList.remove('student-mode');document.getElementById('studentWatermark')?.classList.add('hidden');oldOpenTeacher()}
+const oldLogout=logout;logout=function(){document.body.classList.remove('student-mode');document.getElementById('studentWatermark')?.classList.add('hidden');oldLogout()}
+document.addEventListener('contextmenu',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
+document.addEventListener('copy',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
+document.addEventListener('cut',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
+document.addEventListener('paste',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
+document.addEventListener('dragstart',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
+document.addEventListener('keydown',e=>{if(document.body.classList.contains('student-mode')&&((e.ctrlKey||e.metaKey)&&['c','v','x','s','p','u'].includes(e.key.toLowerCase())))e.preventDefault()});
+const oldRefreshTeacher=refreshTeacher;refreshTeacher=function(){oldRefreshTeacher();const profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');const results=JSON.parse(localStorage.getItem('pp_results')||'{}'),vals=Object.values(results);const avg=vals.length?Math.round(vals.reduce((a,b)=>a+(b.pct||0),0)/vals.length):null;let t=document.getElementById('teacherStudentsTable');if(profile.name)t.innerHTML=`<tr><td>${profile.name}</td><td>${profile.klass||'—'}</td><td>${profile.house||'—'}</td><td>${vals.length}</td><td>${avg===null?'—':avg+'%'}</td><td><div class="admin-actions"><button onclick="adminRemovePoints()">− Points</button><button onclick="adminChangeHouse()">Change House</button><button onclick="adminToggleBan()">${localStorage.getItem(BANNED_KEY)==='1'?'Unban':'Ban'}</button></div>${localStorage.getItem(BANNED_KEY)==='1'?'<div class="banned-note">BANNED</div>':''}</td></tr>`;}
