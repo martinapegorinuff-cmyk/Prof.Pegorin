@@ -32,3 +32,8 @@ v0.9
 v0.9.1
 - teacher.png now has a transparent outer background
 - white rectangular corners around the teacher portrait are removed
+
+v0.9.2
+- fixed a JavaScript syntax error introduced while replacing the badge renderer
+- Student Login and Teacher Login buttons work again
+- all v0.9.1 images, transparent teacher portrait, badges and previous features are preserved

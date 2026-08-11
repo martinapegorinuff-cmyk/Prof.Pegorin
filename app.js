@@ -239,7 +239,7 @@ function renderBadges(){
      <p>${b[1]}</p>
      <b>${b[2]?'Unlocked':'Locked'}</b>
    </div>`).join('');
-}"><div class="medal">${b[2]?'★':'☆'}</div><h3>${b[0]}</h3><p>${b[1]}</p><b>${b[2]?'Unlocked':'Locked'}</b></div>`).join('')}
+}
 const oldRefresh=refresh;refresh=function(){oldRefresh();renderBadges();}
 function adminChangeHouse(){const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');const h=prompt('New House: Gryffindor, Slytherin, Ravenclaw or Hufflepuff',p.house||'');if(!['Gryffindor','Slytherin','Ravenclaw','Hufflepuff'].includes(h))return;p.house=h;localStorage.setItem(PROFILE_KEY,JSON.stringify(p));localStorage.setItem('pp_house',h);refreshTeacher()}
 function adminRemovePoints(){let hp=+(localStorage.getItem('pp_housepoints')||0);let n=+(prompt('How many House Points do you want to remove?','1')||0);if(n>0)localStorage.setItem('pp_housepoints',Math.max(0,hp-n));refreshTeacher()}
