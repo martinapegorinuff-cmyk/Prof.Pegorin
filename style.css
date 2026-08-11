@@ -594,3 +594,6 @@ body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:
 .teacher-password{display:flex;align-items:center;gap:7px;white-space:nowrap}
 .teacher-password-value{font-family:monospace;font-weight:700}
 .show-password-btn{padding:4px 7px!important;font-size:.75rem!important}
+
+/* v1.1.2 teacher student list */
+.teacher-student-name{font-weight:800}

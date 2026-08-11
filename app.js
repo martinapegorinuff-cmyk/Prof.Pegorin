@@ -151,6 +151,14 @@ function teacherUserStats(userId){
   return {vals,avg,hp};
 }
 function jsArg(s){return encodeURIComponent(String(s))}
+function teacherHouseColor(house){
+  return {
+    Ravenclaw:'#0e1a40',
+    Gryffindor:'#740001',
+    Hufflepuff:'#ECB939',
+    Slytherin:'#2a623d'
+  }[house]||'#18344f';
+}
 function toggleTeacherPassword(btn){
   const span=btn.parentElement.querySelector('.teacher-password-value');
   const showing=span.dataset.showing==='1';
@@ -159,7 +167,11 @@ function toggleTeacherPassword(btn){
   btn.textContent=showing?'Mostra':'Nascondi';
 }
 function refreshTeacher(){
-  const users=getUsers(),entries=Object.entries(users);
+  const users=getUsers(),entries=Object.entries(users).sort((a,b)=>{
+    const ua=a[1], ub=b[1];
+    const byLast=(ua.lastName||'').localeCompare(ub.lastName||'','it',{sensitivity:'base'});
+    return byLast || (ua.firstName||'').localeCompare(ub.firstName||'','it',{sensitivity:'base'});
+  });
   const stats=entries.map(([id,u])=>({id,u,...teacherUserStats(id)}));
   const totalAttempts=stats.reduce((n,s)=>n+s.vals.length,0);
   const scores=stats.flatMap(s=>s.vals.map(v=>v.pct||0));
@@ -172,14 +184,14 @@ function refreshTeacher(){
   document.getElementById('teacherLocalPoints').textContent=hp;
 
   const recent=[];
-  stats.forEach(s=>s.vals.forEach(r=>recent.push({name:`${s.u.firstName} ${s.u.lastName}`,r})));
+  stats.forEach(s=>s.vals.forEach(r=>recent.push({name:`${s.u.lastName} ${s.u.firstName}`,r})));
   document.getElementById('teacherRecentActivity').innerHTML=recent.length
     ? recent.slice(-8).reverse().map(x=>`<p><b>${x.name}</b> · ${x.r.title} · ${x.r.pct}% · +${x.r.points||0}</p>`).join('')
     : '<p>No activity saved on this browser yet.</p>';
 
   document.getElementById('teacherStudentsTable').innerHTML=entries.length
     ? stats.map(s=>`<tr>
-      <td>${s.u.firstName} ${s.u.lastName}${s.u.banned?' <span class="banned-note">BANNED</span>':''}</td>
+      <td><span class="teacher-student-name" style="color:${teacherHouseColor(s.u.house)}">${s.u.lastName} ${s.u.firstName}</span>${s.u.banned?' <span class="banned-note">BANNED</span>':''}</td>
       <td>${s.id}</td>
       <td><div class="teacher-password"><span class="teacher-password-value" data-password="${s.u.password}" data-showing="0">••••••••</span><button class="show-password-btn" onclick="toggleTeacherPassword(this)">Mostra</button></div></td>
       <td>${s.u.klass}</td><td>${s.u.house}</td><td>${s.u.email}</td>
@@ -193,7 +205,7 @@ function refreshTeacher(){
     : '<tr><td colspan="9">Nessuno studente registrato su questo browser.</td></tr>';
 
   const rows=[];
-  stats.forEach(s=>s.vals.forEach(r=>rows.push(`<tr><td>${s.u.firstName} ${s.u.lastName}</td><td>${r.title}</td><td>${r.score}/${r.total} (${r.pct}%)</td><td>${r.date||'—'}</td><td>+${r.points||0}</td></tr>`)));
+  stats.forEach(s=>s.vals.forEach(r=>rows.push(`<tr><td><span class="teacher-student-name" style="color:${teacherHouseColor(s.u.house)}">${s.u.lastName} ${s.u.firstName}</span></td><td>${r.title}</td><td>${r.score}/${r.total} (${r.pct}%)</td><td>${r.date||'—'}</td><td>+${r.points||0}</td></tr>`)));
   document.getElementById('teacherResultsTable').innerHTML=rows.length?rows.join(''):'<tr><td colspan="5">No exercise results saved yet.</td></tr>';
 }
 
@@ -419,7 +431,7 @@ function adminToggleBan(userId){
 }
 function adminDeleteUser(userId){
  const users=getUsers(),u=users[userId];if(!u)return;
- if(!confirm(`Delete ${u.firstName} ${u.lastName}? This removes the account and all data stored for this student on this browser.`))return;
+ if(!confirm(`Delete ${u.lastName} ${u.firstName}? This removes the account and all data stored for this student on this browser.`))return;
  delete users[userId];saveUsers(users);
  const prefix=`pp_user_${encodeURIComponent(userId)}_`;
  Object.keys(localStorage).filter(k=>k.startsWith(prefix)).forEach(k=>localStorage.removeItem(k));

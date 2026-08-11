@@ -101,3 +101,13 @@ v1.1.1
 - Registration success screen prominently tells students to save User ID/password and ask the teacher if they lose them.
 - Teacher/Admin student table now shows User ID, school email and password.
 - Passwords are hidden by default and can be revealed individually with Mostra/Nascondi.
+
+v1.1.2
+- Teacher/Admin student list is automatically sorted alphabetically by surname, then first name.
+- Admin name display is now "Cognome Nome".
+- Student names in the Admin area are coloured by House:
+  Ravenclaw #0e1a40
+  Gryffindor #740001
+  Hufflepuff #ECB939
+  Slytherin #2a623d
+- The same surname-first display is used in recent activity and exercise results.
