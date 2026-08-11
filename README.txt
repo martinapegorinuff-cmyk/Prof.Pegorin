@@ -43,3 +43,15 @@ v0.9.3
 - fixed personal-best tracking
 - kept login form handling defensive
 - added cache-busting query strings to CSS/JS for GitHub Pages
+
+v1.0.0 — UNIT 2
+- added the complete approved Unit 2 exercise bank
+- Vocabulary: Family, Family Connections, Physical Appearance, description practice and challenge
+- Grammar: have got, be/have got, demonstratives and possessive ’s
+- one Unit 2 Reading Comprehension and two Revision exercises
+- Unit 2-specific badge set
+- Practice by Topic now includes Units 1–2
+- Practice by Unit now includes separate Unit 1 and Unit 2 views
+- approved V1/V2/V3 artwork reused to avoid unnecessary image proliferation
+- visual demonstrative exercises rendered in HTML/CSS
+- all existing login, teacher/admin, House Points, attempts, anti-copy and watermark functions preserved

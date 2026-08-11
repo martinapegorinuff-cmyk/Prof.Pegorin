@@ -122,21 +122,50 @@ const DB=window.EXERCISES;
 const norm=s=>String(s??'').toLowerCase().trim().replace(/[.!?]/g,'').replace(/[’]/g,"'").replace(/\s+/g,' ');
 function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');window.scrollTo(0,0);refresh();}
 function stars(n){return '★'.repeat(n)}
-function allExercises(){return Object.entries(DB).flatMap(([cat,arr])=>arr.map(e=>({...e,cat})))}
-function showCategory(cat){go('topics');document.getElementById('topicList').innerHTML=`<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${DB[cat].map(e=>card(e,cat)).join('')}</div></section>`}
-function showUnit1(){document.getElementById('unitDetail').innerHTML=Object.keys(DB).map(cat=>`<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${DB[cat].map(e=>card(e,cat)).join('')}</div></section>`).join('');}
-function card(e,cat){return `<div class="exercise-card" onclick="openExercise('${cat.replaceAll("'","\\'")}','${e.id}')"><div class="stars">${stars(e.stars)}</div><h3>${e.title}</h3><p>${e.points} House Points</p><small>${completed(e.id)?'✓ Completed':'Start exercise →'}</small></div>`}
+function allExercises(){return Object.entries(DB).flatMap(([cat,arr])=>arr.map(e=>({...e,unit:e.unit||1,cat})))}
+function showCategory(cat){
+ go('topics');
+ const list=(DB[cat]||[]).map(e=>card(e,cat)).join('');
+ document.getElementById('topicList').innerHTML=`<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${list}</div></section>`;
+}
+function renderUnit(n){
+ const cats=Object.keys(DB);
+ document.getElementById('unitDetail').innerHTML=cats.map(cat=>{
+   const es=(DB[cat]||[]).filter(e=>(e.unit||1)===n);
+   if(!es.length)return '';
+   return `<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${es.map(e=>card(e,cat)).join('')}</div></section>`;
+ }).join('');
+}
+function showUnit1(){renderUnit(1)}
+function showUnit2(){renderUnit(2)}
+function card(e,cat){
+ const unit=e.unit||1;
+ const r=JSON.parse(localStorage.getItem('pp_results')||'{}')[e.id];
+ const at=attempts?.()?.[e.id]||0;
+ const status=r ? `✓ Completed · Best ${r.best??r.pct}%` : 'Start exercise →';
+ return `<div class="exercise-card" onclick="openExercise('${cat.replaceAll("'","\'")}','${e.id}')">
+   <div class="exercise-topline"><span class="unit-pill">Unit ${unit}</span><div class="stars">${stars(e.stars)}</div></div>
+   <h3>${e.title}</h3><p>${e.points} House Points</p><small>${status}${at?` · ${at} attempt${at===1?'':'s'}`:''}</small>
+ </div>`;
+}
 function completed(id){return !!JSON.parse(localStorage.getItem('pp_results')||'{}')[id]}
 function openExercise(cat,id){
  const e=DB[cat].find(x=>x.id===id); window.current={...e,cat};
  go('exercise'); renderExercise(e,cat);
 }
 function renderExercise(e,cat){
- let h=`<div class="exercise-shell"><button class="backbtn" onclick="showCategory('${cat}')">← Back</button><div class="exercise-head"><div><small>${cat}</small><h1>${e.title}</h1></div><div class="difficulty">${stars(e.stars)}<span>${e.points} House Points</span></div></div>`;
- if(e.text)h+=`<div class="reading-text">${e.text.split('\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
- if(e.type==='cloze'){h+=renderCloze(e)}
- else if(e.type==='match'){h+=renderMatch(e)}
- else if(e.type==='multi'){h+=renderMulti(e)}
+ let h=`<div class="exercise-shell"><button class="backbtn" onclick="showCategory('${cat}')">← Back</button>
+ <div class="exercise-head"><div><small>Unit ${e.unit||1} · ${cat}</small><h1>${e.title}</h1></div>
+ <div class="difficulty">${stars(e.stars)}<span>${e.points} House Points</span></div></div>`;
+ if(e.instructions)h+=`<p class="exercise-instructions">${e.instructions}</p>`;
+ if(e.image)h+=`<div class="exercise-visual"><img src="${e.image}" alt=""></div>`;
+ if(e.wordbank)h+=`<div class="word-bank">${e.wordbank.map(w=>`<span>${w}</span>`).join('')}</div>`;
+ if(e.text)h+=`<div class="reading-text">${e.text.split('\\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
+ if(e.type==='cloze')h+=renderCloze(e);
+ else if(e.type==='match')h+=renderMatch(e);
+ else if(e.type==='multi')h+=renderMulti(e);
+ else if(e.type==='demonstrative_mcq')h+=renderDemonstratives(e,true);
+ else if(e.type==='demonstrative_text')h+=renderDemonstratives(e,false);
  else h+=renderStandard(e);
  h+=`<button class="checkbtn" onclick="checkExercise()">CHECK</button><div id="feedback"></div></div>`;
  document.getElementById('exerciseBox').innerHTML=h;
@@ -149,6 +178,23 @@ function renderStandard(e){return `<div class="questions">${e.items.map((it,i)=>
 function renderMatch(e){return `<div class="questions">${e.items.map((it,i)=>`<div class="question"><b>${i+1}. ${it[0]}</b><select class="answer"><option value="">Choose...</option>${shuffle(e.items.map(x=>x[1])).map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('')}</div>`}
 function renderMulti(e){return `<div class="questions">${e.items.map((it,i)=>`<div class="question"><b>${i+1}. ${it[0]}</b><div class="multiinputs">${it[1].map(()=>`<input class="answer" type="text">`).join('')}</div></div>`).join('')}</div>`}
 function renderCloze(e){let n=0;let t=e.text.replace(/___/g,()=>`<input class="clozeInput" data-i="${n++}" type="text">`);return `<div class="reading-text cloze">${t}</div>`}
+
+function demoIcon(name,many){
+ const icons={book:'📕',phone:'📱',bags:'🎒',shoes:'👟',dog:'🐕',girl:'👧',books:'📚',boys:'👦',photo:'🖼️',man:'👨',glasses:'👓',girls:'👧',brother:'👦',parents:'👩‍🦰👨',bag:'🎒',cousins:'🧑🧑',sister:'👧',friends:'🧑🧑',uncle:'👨'};
+ return icons[name]||'●';
+}
+function renderDemonstratives(e,mcq){
+ return `<div class="questions">${e.items.map((it,i)=>{
+   const [obj,count,distance,prompt,answersOrOpts,correct]=it;
+   const far=distance==='far';
+   const visual=`<div class="distance-demo ${far?'far':'near'}"><span class="viewer">YOU</span><span class="object">${demoIcon(obj,count==='many')}</span></div>`;
+   if(mcq){
+      return `<div class="question" data-i="${i}">${visual}<b>${i+1}. ${prompt}</b><div class="options">${answersOrOpts.map(o=>`<label><input type="radio" name="q${i}" value="${esc(o)}"> ${o}</label>`).join('')}</div></div>`;
+   }
+   return `<div class="question" data-i="${i}">${visual}<b>${i+1}. ${prompt}</b><input class="answer" type="text" autocomplete="off"></div>`;
+ }).join('')}</div>`;
+}
+
 function esc(s){return String(s).replace(/"/g,'&quot;')}
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 function accepts(val,ans){
@@ -165,8 +211,15 @@ function checkExercise(){
    qs.forEach((q,i)=>{let ins=[...q.querySelectorAll('input')],ans=e.items[i][1];let ok=ins.length===ans.length&&ins.every((x,j)=>accepts(x.value,ans[j]));q.classList.toggle('qright',ok);q.classList.toggle('qwrong',!ok);if(ok)correct++})
  }else{
    const qs=[...document.querySelectorAll('.question')];total=e.items.length;
-   qs.forEach((q,i)=>{let val;if(e.type==='mcq'||e.type==='reading'){val=q.querySelector('input:checked')?.value||''}else{val=q.querySelector('.answer')?.value||''}
-     let ans=(e.type==='match')?e.items[i][1]:(e.type==='mcq'||e.type==='reading'?e.items[i][2]:e.items[i].slice(1));
+   qs.forEach((q,i)=>{let val;
+     if(e.type==='mcq'||e.type==='reading'||e.type==='demonstrative_mcq'){val=q.querySelector('input:checked')?.value||''}
+     else{val=q.querySelector('.answer')?.value||''}
+     let ans;
+     if(e.type==='match') ans=e.items[i][1];
+     else if(e.type==='mcq'||e.type==='reading') ans=e.items[i][2];
+     else if(e.type==='demonstrative_mcq') ans=e.items[i][5];
+     else if(e.type==='demonstrative_text') ans=e.items[i][4];
+     else ans=e.items[i].slice(1);
      let ok=accepts(val,ans);q.classList.toggle('qright',ok);q.classList.toggle('qwrong',!ok);if(ok)correct++;
    })
  }
@@ -216,7 +269,7 @@ function getProgress(){
  const results=JSON.parse(localStorage.getItem('pp_results')||'{}');
  return Object.entries(results).reduce((acc,[id,r])=>{
    const ex=allExercises().find(e=>e.id===id);
-   acc[id]={id,best:r.best??r.pct??0,last:r.pct??0,stars:ex?.stars??0,cat:ex?.cat??r.cat??'',title:r.title||ex?.title||id,attempts:(attempts()[id]||r.attempt||1)};
+   acc[id]={id,best:r.best??r.pct??0,last:r.pct??0,stars:ex?.stars??0,unit:ex?.unit??1,cat:ex?.cat??r.cat??'',title:r.title||ex?.title||id,attempts:(attempts()[id]||r.attempt||1)};
    return acc;
  },{});
 }
@@ -224,19 +277,24 @@ function badgeData(){
  const rs=Object.values(getProgress());
  const perfect=rs.filter(r=>r.best===100).length;
  const perfect3=rs.filter(r=>r.best===100 && r.stars===3).length;
- const cats={};
- allExercises().forEach(e=>{cats[e.cat]=cats[e.cat]||[];cats[e.cat].push(e.id)});
  const perfectIds=new Set(rs.filter(r=>r.best===100).map(r=>r.id));
- const allPerfect=cat=>(cats[cat]||[]).length>0&&(cats[cat]||[]).every(id=>perfectIds.has(id));
+ const allPerfect=(unit,cat)=>{
+   const ids=allExercises().filter(e=>e.unit===unit && e.cat===cat).map(e=>e.id);
+   return ids.length>0 && ids.every(id=>perfectIds.has(id));
+ };
  return [
   ['Perfect Start','Perfect score in 1 exercise',perfect>=1,'badge_perfect_start.png'],
   ['Perfect Five','Perfect score in 5 exercises',perfect>=5,'badge_perfect_five.png'],
   ['Perfect Ten','Perfect score in 10 exercises',perfect>=10,'badge_perfect_ten.png'],
   ['Challenge Master','Perfect score in 20 three-star exercises',perfect3>=20,'badge_challenge_master.png'],
-  ['Unit 1 · Vocabulary Explorer','Perfect score in every Unit 1 Vocabulary exercise',allPerfect('Vocabulary'),'badge_u1_vocabulary.png'],
-  ['Unit 1 · Grammar Master','Perfect score in every Unit 1 Grammar exercise',allPerfect('Grammar'),'badge_u1_grammar.png'],
-  ['Unit 1 · Reading Explorer','Perfect score in the Unit 1 Reading exercise',allPerfect('Reading Comprehension'),'badge_u1_reading.png'],
-  ['Unit 1 · Revision Master','Perfect score in every Unit 1 Revision exercise',allPerfect('Revision'),'badge_u1_revision.png']
+  ['Unit 1 · Vocabulary Explorer','Perfect score in every Unit 1 Vocabulary exercise',allPerfect(1,'Vocabulary'),'badge_u1_vocabulary.png'],
+  ['Unit 1 · Grammar Master','Perfect score in every Unit 1 Grammar exercise',allPerfect(1,'Grammar'),'badge_u1_grammar.png'],
+  ['Unit 1 · Reading Explorer','Perfect score in the Unit 1 Reading exercise',allPerfect(1,'Reading Comprehension'),'badge_u1_reading.png'],
+  ['Unit 1 · Revision Master','Perfect score in every Unit 1 Revision exercise',allPerfect(1,'Revision'),'badge_u1_revision.png'],
+  ['Unit 2 · Vocabulary Explorer','Perfect score in every Unit 2 Vocabulary exercise',allPerfect(2,'Vocabulary'),'badge_u2_vocabulary.png'],
+  ['Unit 2 · Grammar Master','Perfect score in every Unit 2 Grammar exercise',allPerfect(2,'Grammar'),'badge_u2_grammar.png'],
+  ['Unit 2 · Reading Explorer','Perfect score in the Unit 2 Reading exercise',allPerfect(2,'Reading Comprehension'),'badge_u2_reading.png'],
+  ['Unit 2 · Revision Master','Perfect score in every Unit 2 Revision exercise',allPerfect(2,'Revision'),'badge_u2_revision.png']
  ];
 }
 function renderBadges(){

@@ -550,3 +550,23 @@ body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:
 .badge.unlocked .badge-medal-img{
   filter:drop-shadow(0 4px 5px rgba(116,80,23,.25));
 }
+
+/* ===== v1.0 Unit 2 ===== */
+.exercise-topline{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.unit-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#1d3854;color:#f5e4ac;font-size:.72rem;font-weight:bold;letter-spacing:.04em}
+.exercise-instructions{font-weight:bold;color:#4e4437;margin:18px 0 10px}
+.exercise-visual{text-align:center;margin:16px auto 20px;background:rgba(255,255,255,.25);border:1px solid #c8b490;border-radius:12px;padding:12px}
+.exercise-visual img{display:block;max-width:100%;max-height:720px;margin:auto;object-fit:contain}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 20px;padding:12px;border:1px dashed #b89960;border-radius:10px;background:#fff9e9}
+.word-bank span{padding:5px 9px;border-radius:7px;background:#e9dcc0;color:#23364c;font-weight:bold}
+.distance-demo{height:95px;position:relative;margin-bottom:10px;background:linear-gradient(90deg,#f4ead3,#fbf6e9);border:1px solid #c5b18b;border-radius:9px;overflow:hidden}
+.distance-demo .viewer{position:absolute;left:16px;top:34px;font-weight:bold;color:#1b3651}
+.distance-demo .object{position:absolute;top:21px;font-size:2.6rem}
+.distance-demo.near .object{left:105px}
+.distance-demo.far .object{right:20px;transform:scale(.72)}
+.badge-grid{grid-template-columns:repeat(auto-fit,minmax(205px,1fr))}
+@media(max-width:700px){
+ .exercise-visual img{max-height:500px}
+ .distance-demo{height:80px}
+ .distance-demo .object{font-size:2rem}
+}
