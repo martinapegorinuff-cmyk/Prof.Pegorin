@@ -485,3 +485,68 @@ footer{border-top-color:#aa9878;color:#6c6253}
 /* v0.6 */
 body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:fixed;right:16px;bottom:16px;z-index:90;opacity:.16;pointer-events:none;font:700 13px Arial;transform:rotate(-8deg)}
 .badge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.badge{background:#f7efd9;border:1px solid #aa946c;border-radius:12px;padding:18px}.badge.unlocked{box-shadow:inset 0 4px #b98a35}.admin-actions{display:flex;gap:6px;flex-wrap:wrap}.admin-actions button{padding:6px 8px}.banned-note{color:#8c2c2c;font-weight:bold}
+
+/* v0.7 illustrated topic cards */
+.illustrated-card{padding:0!important;min-height:255px!important;background:#f7efd9!important}
+.illustrated-card img{width:100%;height:175px;object-fit:cover;display:block;border-bottom:1px solid #cdbb96}
+.topic-card-copy{padding:12px 10px 14px}
+.topic-card-copy h3{margin:0 0 5px!important}
+.topic-card-copy p{margin:0!important}
+.visual-category-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;max-width:1200px!important}
+.visual-category-grid button{padding:0!important;overflow:hidden;min-height:300px!important;background:#f7efd9!important}
+.visual-category-grid button img{display:block;width:100%;height:210px;object-fit:cover;border-bottom:1px solid #cdbb96}
+.visual-category-grid button span{display:block;padding:13px}
+.visual-category-grid button small{display:block;margin-top:6px;color:#756650;font-size:.85rem}
+@media(max-width:900px){.visual-category-grid{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:600px){.visual-category-grid{grid-template-columns:1fr!important}}
+
+/* v0.8 — show topic illustrations in full, without cropping */
+.illustrated-card img{
+  width:100% !important;
+  height:190px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  background:#f7efd9;
+  padding:7px;
+}
+.visual-category-grid button img{
+  width:100% !important;
+  height:230px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  background:#f7efd9;
+  padding:8px;
+}
+
+
+/* v0.9 — approved topic artwork + real badge artwork */
+.illustrated-card img{
+  width:100% !important;
+  height:205px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  padding:4px !important;
+  background:#f7efd9 !important;
+}
+.visual-category-grid button img{
+  width:100% !important;
+  height:235px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  padding:5px !important;
+  background:#f7efd9 !important;
+}
+.badge-medal-img{
+  width:122px;
+  height:122px;
+  object-fit:contain;
+  display:block;
+  margin:0 auto 8px;
+  filter:drop-shadow(0 3px 4px rgba(53,38,18,.18));
+}
+.badge.locked .badge-medal-img{
+  filter:grayscale(1) opacity(.42);
+}
+.badge.unlocked .badge-medal-img{
+  filter:drop-shadow(0 4px 5px rgba(116,80,23,.25));
+}

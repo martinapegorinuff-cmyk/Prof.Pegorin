@@ -212,20 +212,34 @@ document.addEventListener('DOMContentLoaded',()=>{
 const ATTEMPTS_KEY='pp_attempts', BANNED_KEY='pp_banned';
 function attempts(){return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}')}
 function badgeData(){
- const rs=Object.values(JSON.parse(localStorage.getItem('pp_results')||'{}'));
- const perfect=rs.filter(r=>r.pct===100).length;
- const perfect3=rs.filter(r=>r.pct===100 && r.points===5).length;
- const cats={}; rs.forEach(r=>{if(r.pct===100)cats[r.cat]=(cats[r.cat]||0)+1});
+ const rs=Object.values(getProgress());
+ const perfect=rs.filter(r=>r.best===100).length;
+ const perfect3=rs.filter(r=>r.best===100 && r.stars===3).length;
+ const cats={};
+ allExercises().forEach(e=>{cats[e.cat]=cats[e.cat]||[];cats[e.cat].push(e.id)});
+ const perfectIds=new Set(rs.filter(r=>r.best===100).map(r=>r.id));
+ const allPerfect=cat=>(cats[cat]||[]).length>0&&(cats[cat]||[]).every(id=>perfectIds.has(id));
  return [
-  ['Perfect Start','Perfect score in 1 exercise',perfect>=1],['Perfect Five','Perfect score in 5 exercises',perfect>=5],['Perfect Ten','Perfect score in 10 exercises',perfect>=10],
-  ['Challenge Master','Perfect score in 20 three-star exercises',perfect3>=20],
-  ['Unit 1 · Vocabulary Explorer','Perfect score in a Unit 1 Vocabulary exercise',(cats.Vocabulary||0)>=1],
-  ['Unit 1 · Grammar Master','Perfect score in a Unit 1 Grammar exercise',(cats.Grammar||0)>=1],
-  ['Unit 1 · Reading Explorer','Perfect score in the Unit 1 Reading exercise',(cats['Reading Comprehension']||0)>=1],
-  ['Unit 1 · Revision Master','Perfect score in a Unit 1 Revision exercise',(cats.Revision||0)>=1]
+  ['Perfect Start','Perfect score in 1 exercise',perfect>=1,'badge_perfect_start.png'],
+  ['Perfect Five','Perfect score in 5 exercises',perfect>=5,'badge_perfect_five.png'],
+  ['Perfect Ten','Perfect score in 10 exercises',perfect>=10,'badge_perfect_ten.png'],
+  ['Challenge Master','Perfect score in 20 three-star exercises',perfect3>=20,'badge_challenge_master.png'],
+  ['Unit 1 · Vocabulary Explorer','Perfect score in every Unit 1 Vocabulary exercise',allPerfect('Vocabulary'),'badge_u1_vocabulary.png'],
+  ['Unit 1 · Grammar Master','Perfect score in every Unit 1 Grammar exercise',allPerfect('Grammar'),'badge_u1_grammar.png'],
+  ['Unit 1 · Reading Explorer','Perfect score in the Unit 1 Reading exercise',allPerfect('Reading Comprehension'),'badge_u1_reading.png'],
+  ['Unit 1 · Revision Master','Perfect score in every Unit 1 Revision exercise',allPerfect('Revision'),'badge_u1_revision.png']
  ];
 }
-function renderBadges(){const x=document.getElementById('badgeGrid');if(!x)return;x.innerHTML=badgeData().map(b=>`<div class="badge ${b[2]?'unlocked':'locked'}"><div class="medal">${b[2]?'★':'☆'}</div><h3>${b[0]}</h3><p>${b[1]}</p><b>${b[2]?'Unlocked':'Locked'}</b></div>`).join('')}
+function renderBadges(){
+ const x=document.getElementById('badgeGrid');if(!x)return;
+ x.innerHTML=badgeData().map(b=>`
+   <div class="badge ${b[2]?'unlocked':'locked'}">
+     <img class="badge-medal-img" src="assets/${b[3]}" alt="${b[0]}">
+     <h3>${b[0]}</h3>
+     <p>${b[1]}</p>
+     <b>${b[2]?'Unlocked':'Locked'}</b>
+   </div>`).join('');
+}"><div class="medal">${b[2]?'★':'☆'}</div><h3>${b[0]}</h3><p>${b[1]}</p><b>${b[2]?'Unlocked':'Locked'}</b></div>`).join('')}
 const oldRefresh=refresh;refresh=function(){oldRefresh();renderBadges();}
 function adminChangeHouse(){const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');const h=prompt('New House: Gryffindor, Slytherin, Ravenclaw or Hufflepuff',p.house||'');if(!['Gryffindor','Slytherin','Ravenclaw','Hufflepuff'].includes(h))return;p.house=h;localStorage.setItem(PROFILE_KEY,JSON.stringify(p));localStorage.setItem('pp_house',h);refreshTeacher()}
 function adminRemovePoints(){let hp=+(localStorage.getItem('pp_housepoints')||0);let n=+(prompt('How many House Points do you want to remove?','1')||0);if(n>0)localStorage.setItem('pp_housepoints',Math.max(0,hp-n));refreshTeacher()}

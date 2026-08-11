@@ -113,10 +113,22 @@
 
       <div class="section-head"><h2>UNIT 1 PRACTICE</h2></div>
       <div class="topic-cards">
-        <article onclick="showCategory('Vocabulary')" class="illustrated-card"><div class="art">Aa</div><h3>VOCABULARY</h3><p>Countries & nationalities</p></article>
-        <article onclick="showCategory('Grammar')" class="illustrated-card"><div class="art">⌘</div><h3>GRAMMAR</h3><p>Pronouns · be · questions · possessives</p></article>
-        <article onclick="showCategory('Reading Comprehension')" class="illustrated-card"><div class="art">▤</div><h3>READING</h3><p>An international class</p></article>
-        <article onclick="showCategory('Revision')" class="illustrated-card"><div class="art">✦</div><h3>REVISION</h3><p>Mixed Unit 1 practice</p></article>
+        <article onclick="showCategory('Vocabulary')" class="illustrated-card">
+          <img src="assets/topic_vocabulary.png" alt="Vocabulary">
+          <div class="topic-card-copy"><h3>VOCABULARY</h3><p>Learn and practise new words.</p></div>
+        </article>
+        <article onclick="showCategory('Grammar')" class="illustrated-card">
+          <img src="assets/topic_grammar.png" alt="Grammar">
+          <div class="topic-card-copy"><h3>GRAMMAR</h3><p>Understand the rules and practise grammar.</p></div>
+        </article>
+        <article onclick="showCategory('Reading Comprehension')" class="illustrated-card">
+          <img src="assets/topic_reading.png" alt="Reading comprehension">
+          <div class="topic-card-copy"><h3>READING</h3><p>Read, understand and answer questions.</p></div>
+        </article>
+        <article onclick="showCategory('Revision')" class="illustrated-card">
+          <img src="assets/topic_revision.png" alt="Revision">
+          <div class="topic-card-copy"><h3>REVISION</h3><p>Mix topics and check what you remember.</p></div>
+        </article>
       </div>
     </div>
 
@@ -137,11 +149,11 @@
 
 <section id="topics" class="page">
   <div class="page-title"><h1>Practice by Topic</h1><p>Choose a section.</p></div>
-  <div class="large-category-grid">
-    <button onclick="showCategory('Vocabulary')"><b>VOCABULARY</b></button>
-    <button onclick="showCategory('Grammar')"><b>GRAMMAR</b></button>
-    <button onclick="showCategory('Reading Comprehension')"><b>READING</b></button>
-    <button onclick="showCategory('Revision')"><b>REVISION</b></button>
+  <div class="large-category-grid visual-category-grid">
+    <button onclick="showCategory('Vocabulary')"><img src="assets/topic_vocabulary.png" alt=""><span><b>VOCABULARY</b><small>Countries & nationalities</small></span></button>
+    <button onclick="showCategory('Grammar')"><img src="assets/topic_grammar.png" alt=""><span><b>GRAMMAR</b><small>Unit 1 grammar practice</small></span></button>
+    <button onclick="showCategory('Reading Comprehension')"><img src="assets/topic_reading.png" alt=""><span><b>READING</b><small>Reading comprehension</small></span></button>
+    <button onclick="showCategory('Revision')"><img src="assets/topic_revision.png" alt=""><span><b>REVISION</b><small>Mixed Unit 1 practice</small></span></button>
   </div>
   <div id="topicList"></div>
 </section>
@@ -181,7 +193,7 @@
   </div>
 </div>
 
-<footer><span>Prof. Pegorin English · Unit 1 prototype v0.6</span></footer>
+<footer><span>Prof. Pegorin English · Unit 1 prototype v0.9.1</span></footer>
 </div>
 
 <div id="teacherApp" class="hidden">
