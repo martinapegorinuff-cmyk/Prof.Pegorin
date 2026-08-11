@@ -166,12 +166,37 @@ function toggleTeacherPassword(btn){
   span.dataset.showing=showing?'0':'1';
   btn.textContent=showing?'Mostra':'Nascondi';
 }
+function teacherHouseColor(house){
+  return {
+    Ravenclaw:'#0e1a40',
+    Gryffindor:'#740001',
+    Hufflepuff:'#ECB939',
+    Slytherin:'#2a623d'
+  }[house]||'#18344f';
+}
+function toggleTeacherPassword(btn){
+  const span=btn.parentElement.querySelector('.teacher-password-value');
+  const showing=span.dataset.showing==='1';
+  span.textContent=showing?'••••••••':span.dataset.password;
+  span.dataset.showing=showing?'0':'1';
+  btn.textContent=showing?'Mostra':'Nascondi';
+}
+function teacherUserStats(userId){
+  const results=JSON.parse(localStorage.getItem(userKey('results',userId))||'{}');
+  const vals=Object.values(results);
+  const avg=vals.length?Math.round(vals.reduce((a,b)=>a+(b.pct||0),0)/vals.length):null;
+  const hp=+(localStorage.getItem(userKey('housepoints',userId))||0);
+  return {vals,avg,hp};
+}
+function jsArg(s){return encodeURIComponent(String(s))}
 function refreshTeacher(){
-  const users=getUsers(),entries=Object.entries(users).sort((a,b)=>{
+  const users=getUsers();
+  const entries=Object.entries(users).sort((a,b)=>{
     const ua=a[1], ub=b[1];
     const byLast=(ua.lastName||'').localeCompare(ub.lastName||'','it',{sensitivity:'base'});
     return byLast || (ua.firstName||'').localeCompare(ub.firstName||'','it',{sensitivity:'base'});
   });
+
   const stats=entries.map(([id,u])=>({id,u,...teacherUserStats(id)}));
   const totalAttempts=stats.reduce((n,s)=>n+s.vals.length,0);
   const scores=stats.flatMap(s=>s.vals.map(v=>v.pct||0));
@@ -184,9 +209,9 @@ function refreshTeacher(){
   document.getElementById('teacherLocalPoints').textContent=hp;
 
   const recent=[];
-  stats.forEach(s=>s.vals.forEach(r=>recent.push({name:`${s.u.lastName} ${s.u.firstName}`,r})));
+  stats.forEach(s=>s.vals.forEach(r=>recent.push({s,r})));
   document.getElementById('teacherRecentActivity').innerHTML=recent.length
-    ? recent.slice(-8).reverse().map(x=>`<p><b>${x.name}</b> · ${x.r.title} · ${x.r.pct}% · +${x.r.points||0}</p>`).join('')
+    ? recent.slice(-8).reverse().map(x=>`<p><b class="teacher-student-name" style="color:${teacherHouseColor(x.s.u.house)}">${x.s.u.lastName} ${x.s.u.firstName}</b> · ${x.r.title} · ${x.r.pct}% · +${x.r.points||0}</p>`).join('')
     : '<p>No activity saved on this browser yet.</p>';
 
   document.getElementById('teacherStudentsTable').innerHTML=entries.length
@@ -194,18 +219,30 @@ function refreshTeacher(){
       <td><span class="teacher-student-name" style="color:${teacherHouseColor(s.u.house)}">${s.u.lastName} ${s.u.firstName}</span>${s.u.banned?' <span class="banned-note">BANNED</span>':''}</td>
       <td>${s.id}</td>
       <td><div class="teacher-password"><span class="teacher-password-value" data-password="${s.u.password}" data-showing="0">••••••••</span><button class="show-password-btn" onclick="toggleTeacherPassword(this)">Mostra</button></div></td>
-      <td>${s.u.klass}</td><td>${s.u.house}</td><td>${s.u.email}</td>
-      <td>${s.vals.length}</td><td>${s.avg===null?'—':s.avg+'%'}</td>
+      <td>${s.u.klass}</td>
+      <td>${s.u.house}</td>
+      <td>${s.u.email}</td>
+      <td>${s.vals.length}</td>
+      <td>${s.avg===null?'—':s.avg+'%'}</td>
       <td><div class="admin-actions">
         <button onclick="adminRemovePoints(decodeURIComponent('${jsArg(s.id)}'))">− Points</button>
         <button onclick="adminChangeHouse(decodeURIComponent('${jsArg(s.id)}'))">Change House</button>
         <button onclick="adminToggleBan(decodeURIComponent('${jsArg(s.id)}'))">${s.u.banned?'Unban':'Ban'}</button>
         <button class="danger-btn" onclick="adminDeleteUser(decodeURIComponent('${jsArg(s.id)}'))">Delete</button>
-      </div></td></tr>`).join('')
+      </div></td>
+    </tr>`).join('')
     : '<tr><td colspan="9">Nessuno studente registrato su questo browser.</td></tr>';
 
   const rows=[];
-  stats.forEach(s=>s.vals.forEach(r=>rows.push(`<tr><td><span class="teacher-student-name" style="color:${teacherHouseColor(s.u.house)}">${s.u.lastName} ${s.u.firstName}</span></td><td>${r.title}</td><td>${r.score}/${r.total} (${r.pct}%)</td><td>${r.date||'—'}</td><td>+${r.points||0}</td></tr>`)));
+  stats.forEach(s=>s.vals.forEach(r=>{
+    rows.push(`<tr>
+      <td><span class="teacher-student-name" style="color:${teacherHouseColor(s.u.house)}">${s.u.lastName} ${s.u.firstName}</span></td>
+      <td>${r.title}</td>
+      <td>${r.score}/${r.total} (${r.pct}%)</td>
+      <td>${r.date||'—'}</td>
+      <td>+${r.points||0}</td>
+    </tr>`);
+  }));
   document.getElementById('teacherResultsTable').innerHTML=rows.length?rows.join(''):'<tr><td colspan="5">No exercise results saved yet.</td></tr>';
 }
 
