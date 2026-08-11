@@ -69,3 +69,12 @@ v1.0.2
 - Re-aligned every Unit 2 prompt that refers to V1/V2/V3.
 - Removed all references to obsolete V3 pictures 15 and 16.
 - Checked Vocabulary challenge distractors and Unit 2 Revision image references.
+
+v1.0.3
+- actually replaced Unit 2 V1, V2 and V3 with the final approved images
+- V1 includes node 3 for parents
+- V2 uses the centered-name final family tree
+- V2 prompts now use only relationships unambiguously visible in that tree
+- V3 uses the final 14-picture board only
+- V3/V4/V5/V6 and Revision prompts updated to match pictures 1–14
+- removed all references to discarded V3 images
