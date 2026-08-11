@@ -37,3 +37,9 @@ v0.9.2
 - fixed a JavaScript syntax error introduced while replacing the badge renderer
 - Student Login and Teacher Login buttons work again
 - all v0.9.1 images, transparent teacher portrait, badges and previous features are preserved
+
+v0.9.3
+- fixed missing getProgress() function used by the badge/progress system
+- fixed personal-best tracking
+- kept login form handling defensive
+- added cache-busting query strings to CSS/JS for GitHub Pages

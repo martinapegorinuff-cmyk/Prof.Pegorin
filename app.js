@@ -3,8 +3,9 @@ const LOGIN_KEY='pp_current_role';
 const PROFILE_KEY='pp_student_profile';
 
 function showLoginForm(role){
-  document.getElementById('studentLoginForm').classList.toggle('hidden',role!=='student');
-  document.getElementById('teacherLoginForm').classList.toggle('hidden',role!=='teacher');
+  const s=document.getElementById('studentLoginForm'),t=document.getElementById('teacherLoginForm');
+  if(s)s.classList.toggle('hidden',role!=='student');
+  if(t)t.classList.toggle('hidden',role!=='teacher');
 }
 function hideLoginForms(){
   document.getElementById('studentLoginForm').classList.add('hidden');
@@ -177,7 +178,7 @@ function checkExercise(){
  if(earned>0) award(earned); else refresh();
 }
 function completedBefore(id){let r=JSON.parse(localStorage.getItem('pp_awarded')||'{}');if(r[id])return true;r[id]=true;localStorage.setItem('pp_awarded',JSON.stringify(r));return false}
-function saveResult(id,obj){let r=JSON.parse(localStorage.getItem('pp_results')||'{}');r[id]=obj;localStorage.setItem('pp_results',JSON.stringify(r))}
+function saveResult(id,obj){let r=JSON.parse(localStorage.getItem('pp_results')||'{}');const prev=r[id]||{};obj.best=Math.max(prev.best??prev.pct??0,obj.pct??0);obj.first=prev.first??obj.pct;obj.latest=obj.pct;r[id]={...prev,...obj};localStorage.setItem('pp_results',JSON.stringify(r))}
 function award(points){
  let hp=+(localStorage.getItem('pp_housepoints')||0);hp+=points;localStorage.setItem('pp_housepoints',hp);
  const profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');const house=profile.house||localStorage.getItem('pp_house')||'Gryffindor';localStorage.setItem('pp_house',house);
@@ -211,6 +212,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 /* ===== v0.6 engagement/admin/protection ===== */
 const ATTEMPTS_KEY='pp_attempts', BANNED_KEY='pp_banned';
 function attempts(){return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}')}
+function getProgress(){
+ const results=JSON.parse(localStorage.getItem('pp_results')||'{}');
+ return Object.entries(results).reduce((acc,[id,r])=>{
+   const ex=allExercises().find(e=>e.id===id);
+   acc[id]={id,best:r.best??r.pct??0,last:r.pct??0,stars:ex?.stars??0,cat:ex?.cat??r.cat??'',title:r.title||ex?.title||id,attempts:(attempts()[id]||r.attempt||1)};
+   return acc;
+ },{});
+}
 function badgeData(){
  const rs=Object.values(getProgress());
  const perfect=rs.filter(r=>r.best===100).length;
