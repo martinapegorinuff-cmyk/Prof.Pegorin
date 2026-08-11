@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prof. Pegorin English</title>
-<link rel="stylesheet" href="style.css?v=110">
+<link rel="stylesheet" href="style.css?v=111">
 </head>
 <body>
 
@@ -57,44 +57,44 @@
   </div>
 
   <div id="studentRegisterPane" class="hidden">
-    <h2>Student Registration</h2>
+    <h2>Registrazione studente</h2>
     <div class="registration-grid">
-      <label>First name
+      <label>Nome
         <input id="regFirstName" type="text" autocomplete="given-name">
       </label>
-      <label>Last name
+      <label>Cognome
         <input id="regLastName" type="text" autocomplete="family-name">
       </label>
-      <label>Class
+      <label>Classe
         <input id="regClass" type="text" placeholder="e.g. 1A">
       </label>
-      <label>House
+      <label>Casata
         <select id="regHouse">
-          <option value="" selected disabled>Choose your House</option>
+          <option value="" selected disabled>Scegli la tua casata</option>
           <option>Gryffindor</option>
           <option>Slytherin</option>
           <option>Ravenclaw</option>
           <option>Hufflepuff</option>
         </select>
       </label>
-      <label class="registration-email">Email
-        <input id="regEmail" type="email" autocomplete="email" placeholder="name@example.com">
+      <label class="registration-email">Email scolastica
+        <input id="regEmail" type="email" autocomplete="email" placeholder="nome@scuola.it">
       </label>
     </div>
-    <button class="login-submit" onclick="registerStudent()">Register</button>
+    <button class="login-submit" onclick="registerStudent()">Registrati</button>
     <div id="registrationFeedback" class="login-feedback"></div>
-    <small>After registration, these details and your House cannot be changed by the student.</small>
+    <small>Dopo la registrazione questi dati e la casata non potranno essere modificati dallo studente.</small>
   </div>
 
   <div id="registrationSuccess" class="registration-success hidden">
-    <h2>Registration complete</h2>
-    <p>Your credentials have been created.</p>
+    <h2>Registrazione completata</h2>
+    <div class="save-login-warning"><strong>Salva i tuoi dati di accesso!</strong><br>Annota o salva il tuo <b>User ID</b> e la tua <b>password</b>. Ti serviranno ogni volta che vorrai accedere al sito.<br><br><b>Se li perdi o li dimentichi, chiedi aiuto alla tua insegnante.</b></div>
     <div class="credential-card">
       <span>User ID</span><b id="generatedUserId"></b>
       <span>Password</span><b id="generatedPassword"></b>
     </div>
     <p id="registrationEmailStatus" class="email-status"></p>
-    <button class="login-submit" onclick="useGeneratedLogin()">Go to login</button>
+    <button class="login-submit" onclick="useGeneratedLogin()">Vai al login</button>
   </div>
 </div>
 
@@ -243,7 +243,7 @@
   </div>
 </div>
 
-<footer><span>Prof. Pegorin English · Units 1–2 prototype v1.1.0</span></footer>
+<footer><span>Prof. Pegorin English · Units 1–2 prototype v1.1.1</span></footer>
 </div>
 
 <div id="teacherApp" class="hidden">
@@ -285,7 +285,7 @@
         <div class="teacher-title"><h2>Students</h2><p>Registered student accounts stored in this browser prototype.</p></div>
         <div class="teacher-card">
           <table>
-            <thead><tr><th>Name</th><th>User ID</th><th>Class</th><th>House</th><th>Email</th><th>Completed</th><th>Average</th><th>Admin</th></tr></thead>
+            <thead><tr><th>Name</th><th>User ID</th><th>Password</th><th>Class</th><th>House</th><th>Email scolastica</th><th>Completed</th><th>Average</th><th>Admin</th></tr></thead>
             <tbody id="teacherStudentsTable"></tbody>
           </table>
         </div>
@@ -332,8 +332,8 @@
 </main>
 </div>
 
-<script src="exercises.js?v=110"></script>
+<script src="exercises.js?v=111"></script>
 <div id="studentWatermark" class="watermark hidden"></div>
-<script src="app.js?v=110"></script>
+<script src="app.js?v=111"></script>
 </body>
 </html>

@@ -587,3 +587,10 @@ body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:
 .danger-btn{background:#7c2f2f!important;color:#fff!important;border-color:#7c2f2f!important}
 .banned-note{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:5px;background:#7c2f2f;color:#fff;font-size:.7rem;font-weight:bold}
 @media(max-width:720px){.registration-grid{grid-template-columns:1fr}.registration-email{grid-column:auto}}
+
+/* v1.1.1 registration/access details */
+.save-login-warning{margin:12px 0 18px;padding:15px 16px;border:2px solid #b28a36;border-radius:10px;background:#fff5cf;color:#352b1e;line-height:1.45}
+.save-login-warning strong{display:block;font-size:1.12rem;color:#18344f;margin-bottom:4px}
+.teacher-password{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.teacher-password-value{font-family:monospace;font-weight:700}
+.show-password-btn{padding:4px 7px!important;font-size:.75rem!important}

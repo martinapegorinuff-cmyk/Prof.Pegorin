@@ -49,17 +49,17 @@ function registerStudent(){
   const house=document.getElementById('regHouse').value;
   const email=normalizeName(document.getElementById('regEmail').value).toLowerCase();
   const fb=document.getElementById('registrationFeedback');fb.textContent='';
-  if(!firstName||!lastName||!klass||!house||!email){fb.textContent='Please complete every field.';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){fb.textContent='Please enter a valid email address.';return}
+  if(!firstName||!lastName||!klass||!house||!email){fb.textContent='Compila tutti i campi.';return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){fb.textContent='Inserisci un indirizzo email scolastico valido.';return}
   const userId=`${firstName} ${lastName}`,users=getUsers();
-  if(users[userId]){fb.textContent='An account with this name already exists. Please ask your teacher.';return}
+  if(users[userId]){fb.textContent='Esiste già un account con questo nome. Chiedi aiuto alla tua insegnante.';return}
   const password=makePassword(firstName,lastName);
   users[userId]={firstName,lastName,klass,house,email,password,banned:false,createdAt:new Date().toISOString()};
   saveUsers(users);
   document.getElementById('generatedUserId').textContent=userId;
   document.getElementById('generatedPassword').textContent=password;
   document.getElementById('registrationEmailStatus').textContent=
-    `Credentials are ready for ${email}. Automatic email delivery requires the future backend; in this GitHub Pages prototype they are shown here instead.`;
+    `Le credenziali sono state create per ${email}. In questa versione del sito non vengono inviate via email: salvale ora. Se le perdi, potrai chiederle alla tua insegnante.`;
   document.getElementById('studentRegisterPane').classList.add('hidden');
   document.getElementById('studentLoginTab').classList.remove('active');
   document.getElementById('studentRegisterTab').classList.remove('active');
@@ -151,6 +151,13 @@ function teacherUserStats(userId){
   return {vals,avg,hp};
 }
 function jsArg(s){return encodeURIComponent(String(s))}
+function toggleTeacherPassword(btn){
+  const span=btn.parentElement.querySelector('.teacher-password-value');
+  const showing=span.dataset.showing==='1';
+  span.textContent=showing?'••••••••':span.dataset.password;
+  span.dataset.showing=showing?'0':'1';
+  btn.textContent=showing?'Mostra':'Nascondi';
+}
 function refreshTeacher(){
   const users=getUsers(),entries=Object.entries(users);
   const stats=entries.map(([id,u])=>({id,u,...teacherUserStats(id)}));
@@ -173,7 +180,9 @@ function refreshTeacher(){
   document.getElementById('teacherStudentsTable').innerHTML=entries.length
     ? stats.map(s=>`<tr>
       <td>${s.u.firstName} ${s.u.lastName}${s.u.banned?' <span class="banned-note">BANNED</span>':''}</td>
-      <td>${s.id}</td><td>${s.u.klass}</td><td>${s.u.house}</td><td>${s.u.email}</td>
+      <td>${s.id}</td>
+      <td><div class="teacher-password"><span class="teacher-password-value" data-password="${s.u.password}" data-showing="0">••••••••</span><button class="show-password-btn" onclick="toggleTeacherPassword(this)">Mostra</button></div></td>
+      <td>${s.u.klass}</td><td>${s.u.house}</td><td>${s.u.email}</td>
       <td>${s.vals.length}</td><td>${s.avg===null?'—':s.avg+'%'}</td>
       <td><div class="admin-actions">
         <button onclick="adminRemovePoints(decodeURIComponent('${jsArg(s.id)}'))">− Points</button>
@@ -181,7 +190,7 @@ function refreshTeacher(){
         <button onclick="adminToggleBan(decodeURIComponent('${jsArg(s.id)}'))">${s.u.banned?'Unban':'Ban'}</button>
         <button class="danger-btn" onclick="adminDeleteUser(decodeURIComponent('${jsArg(s.id)}'))">Delete</button>
       </div></td></tr>`).join('')
-    : '<tr><td colspan="8">No registered students on this browser yet.</td></tr>';
+    : '<tr><td colspan="9">Nessuno studente registrato su questo browser.</td></tr>';
 
   const rows=[];
   stats.forEach(s=>s.vals.forEach(r=>rows.push(`<tr><td>${s.u.firstName} ${s.u.lastName}</td><td>${r.title}</td><td>${r.score}/${r.total} (${r.pct}%)</td><td>${r.date||'—'}</td><td>+${r.points||0}</td></tr>`)));

@@ -94,3 +94,10 @@ v1.1.0
 - Teacher area supports multiple locally registered users: Change House, Remove Points, Ban/Unban and Delete User.
 - Exercise results, attempts and House Points are stored separately per registered account.
 IMPORTANT: GitHub Pages is static. Automatic email sending is not active in this prototype; credentials are shown after registration. Real email delivery and secure authentication require a backend/email service.
+
+v1.1.1
+- Student registration labels are now in Italian; House names remain in English.
+- Registration asks specifically for "Email scolastica".
+- Registration success screen prominently tells students to save User ID/password and ask the teacher if they lose them.
+- Teacher/Admin student table now shows User ID, school email and password.
+- Passwords are hidden by default and can be revealed individually with Mostra/Nascondi.
