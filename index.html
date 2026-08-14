@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prof. Pegorin English</title>
-<link rel="stylesheet" href="style.css?v=150">
+<link rel="stylesheet" href="style.css?v=151">
 </head>
 <body>
 
@@ -45,7 +45,10 @@
       <input id="studentUserIdInput" type="text" autocomplete="username" placeholder="e.g. Martina Pegorin">
     </label>
     <label>Password
-      <input id="studentPasswordInput" type="password" autocomplete="current-password" placeholder="Your password">
+      <span class="password-input-wrap">
+        <input id="studentPasswordInput" type="password" autocomplete="current-password" placeholder="Your password">
+        <button id="studentPasswordToggle" class="password-toggle" type="button" onclick="toggleStudentPassword()" aria-label="Show password" aria-pressed="false">Show</button>
+      </span>
     </label>
     <label class="remember-row">
       <input id="studentRememberInput" type="checkbox">
@@ -362,8 +365,8 @@
 </main>
 </div>
 
-<script src="exercises.js?v=150"></script>
+<script src="exercises.js?v=151"></script>
 <div id="studentWatermark" class="watermark hidden"></div>
-<script src="app.js?v=150"></script>
+<script src="app.js?v=151"></script>
 </body>
 </html>

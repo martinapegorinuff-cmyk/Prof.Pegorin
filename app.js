@@ -20,8 +20,14 @@ function applyHouseTheme(house){
 }
 function clearHouseTheme(){document.body.classList.remove(...HOUSE_THEME_CLASSES)}
 function resolveUser(userId){
-  const id=String(userId||'');
-  return getUsers()[id]||TEST_ACCOUNTS[id.toLowerCase()]||null;
+  const id=String(userId||'').trim();
+  const preset=TEST_ACCOUNTS[id.toLowerCase()];
+  // Reserved quick-test IDs always resolve to their built-in House account,
+  // even if an older local registration exists with the same name.
+  return preset||getUsers()[id]||null;
+}
+function isPresetTestAccount(userId){
+  return !!TEST_ACCOUNTS[String(userId||'').trim().toLowerCase()];
 }
 
 const HOUSE_POINTS_START = new Date(2026,8,1,0,0,0); // 1 September 2026
@@ -161,6 +167,16 @@ function useGeneratedLogin(){
   document.getElementById('studentUserIdInput').value=document.getElementById('generatedUserId').textContent;
   document.getElementById('studentPasswordInput').value=document.getElementById('generatedPassword').textContent;
   showStudentAuth('login');
+}
+function toggleStudentPassword(){
+  const input=document.getElementById('studentPasswordInput');
+  const btn=document.getElementById('studentPasswordToggle');
+  if(!input||!btn)return;
+  const show=input.type==='password';
+  input.type=show?'text':'password';
+  btn.textContent=show?'Hide':'Show';
+  btn.setAttribute('aria-pressed',show?'true':'false');
+  btn.setAttribute('aria-label',show?'Hide password':'Show password');
 }
 function studentLogin(){
   const typedUserId=normalizeName(document.getElementById('studentUserIdInput').value);
@@ -695,7 +711,7 @@ document.addEventListener('keydown',e=>{if(document.body.classList.contains('stu
       if(/^Units 1[–-]4\b/.test(el.textContent)) el.textContent=el.textContent.replace(/^Units 1[–-]4/,'Units 1–5');
     });
     const footer=document.querySelector('footer span');
-    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-]4/g,'Units 1–5').replace(/v1\.3\.\d+/,'v1.4.0');
+    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-]4/g,'Units 1–5').replace(/v1\.[0-9]+\.[0-9]+/,'v1.5.1');
   }
   function bindEnter(){
     ['studentUserIdInput','studentPasswordInput'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();studentLogin();}}));

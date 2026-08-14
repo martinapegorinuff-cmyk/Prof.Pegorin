@@ -742,3 +742,71 @@ body[class*="house-"] .question b,body[class*="house-"] .reading-text p{color:#2
   .teacher-preview-bar{gap:8px;padding:7px 8px}.teacher-preview-bar strong{width:100%;text-align:center}.teacher-preview-bar button{width:100%}
   body.teacher-preview-mode .site-header{top:88px}
 }
+
+
+/* ===== v1.5.1 House background refinements + password visibility ===== */
+.password-input-wrap{display:flex;align-items:stretch;gap:8px;margin-top:6px}
+.login-form .password-input-wrap input{margin-top:0;min-width:0;flex:1}
+.password-toggle{
+  flex:0 0 auto;min-width:68px;padding:0 11px;border:1px solid #9e8963;border-radius:8px;
+  background:#eee3cd;color:#18344f;font:700 .86rem Georgia,'Times New Roman',serif;cursor:pointer
+}
+.password-toggle:hover{background:#e1d2b4}
+.password-toggle:focus-visible{outline:3px solid #d3a625;outline-offset:2px}
+
+/* A subtle House tint across the overall student-site background. Learning cards remain neutral below. */
+body.house-gryffindor{
+  background:
+    radial-gradient(circle at 15% 16%,rgba(174,0,1,.12),transparent 28%),
+    radial-gradient(circle at 85% 26%,rgba(211,166,37,.10),transparent 24%),
+    linear-gradient(#f2e2dc,#f7eee4 43%,#ead8cf);
+}
+body.house-slytherin{
+  background:
+    radial-gradient(circle at 15% 16%,rgba(42,98,61,.13),transparent 28%),
+    radial-gradient(circle at 85% 26%,rgba(192,192,192,.16),transparent 24%),
+    linear-gradient(#e0e9df,#f1f2e8 43%,#dce5db);
+}
+body.house-ravenclaw{
+  background:
+    radial-gradient(circle at 15% 16%,rgba(34,47,91,.13),transparent 28%),
+    radial-gradient(circle at 85% 26%,rgba(140,98,57,.10),transparent 24%),
+    linear-gradient(#dde3ee,#f0ece4 43%,#d7ddea);
+}
+body.house-hufflepuff{
+  background:
+    radial-gradient(circle at 15% 16%,rgba(243,198,35,.20),transparent 30%),
+    radial-gradient(circle at 85% 26%,rgba(232,163,23,.13),transparent 24%),
+    linear-gradient(#f5ebc9,#f8f0db 43%,#eee0b7);
+}
+
+/* Hufflepuff uses its yellow identity on the main navigation, with dark text for strong contrast. */
+body.house-hufflepuff .topnav{
+  background:linear-gradient(90deg,#e8a317,#f3c623,#e8a317)!important;
+  border-top-color:#222!important;border-bottom-color:#000!important;color:#111!important;
+}
+body.house-hufflepuff .nav-item,
+body.house-hufflepuff .profile,
+body.house-hufflepuff .profile small,
+body.house-hufflepuff .logout-btn{color:#111!important}
+body.house-hufflepuff .profile{border-left-color:#00000033}
+body.house-hufflepuff .logout-btn{border-color:#00000055;background:#ffffff45}
+body.house-hufflepuff .nav-item:hover,
+body.house-hufflepuff .nav-item.active{
+  color:#111!important;background:#ffffff2d;border-bottom-color:#000!important;
+}
+
+/* Keep the main learning surfaces consistently readable over the House-tinted page background. */
+body[class*="house-"] .exercise-shell,
+body[class*="house-"] .song-card,
+body[class*="house-"] .unit,
+body[class*="house-"] .topic,
+body[class*="house-"] .badge,
+body[class*="house-"] .side-panel,
+body[class*="house-"] .welcome-card,
+body[class*="house-"] .progress-card,
+body[class*="house-"] .house-card,
+body[class*="house-"] .coming,
+body[class*="house-"] .teacher-dashboard{
+  color:#25261f;
+}
