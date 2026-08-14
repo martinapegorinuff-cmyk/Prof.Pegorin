@@ -681,3 +681,64 @@ body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:
     max-width:none;
   }
 }
+
+
+/* ===== v1.5 House themes + Teacher Preview ===== */
+.teacher-preview-bar{
+  position:sticky;top:0;z-index:120;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+  padding:9px 16px;background:#111c29;color:#fff;border-bottom:2px solid #d2ad58;box-shadow:0 3px 10px #0003;
+  font-family:Georgia,'Times New Roman',serif;
+}
+.teacher-preview-bar label{display:flex;align-items:center;gap:7px;font-size:.9rem}
+.teacher-preview-bar select{padding:6px 9px;border-radius:7px;border:1px solid #d8c28f;background:#fffaf0;color:#1b2c40;font:inherit}
+.teacher-preview-bar button{padding:7px 12px;border:1px solid #d8c28f;border-radius:7px;background:#f5e6bc;color:#1b2c40;font-weight:700;cursor:pointer}
+.teacher-preview-launch{width:100%;margin-top:14px;padding:11px 10px;border:1px solid #8b6a34!important;border-radius:8px!important;background:linear-gradient(#d9b968,#b98a35)!important;color:#211b12!important;font-weight:800;cursor:pointer;text-align:left}
+body.teacher-preview-mode .profile .logout-btn{display:none!important}
+body.teacher-preview-mode .site-header{top:42px}
+
+body.house-gryffindor{--house-main:#ae0001;--house-secondary:#d3a625;--house-dark:#740001;--house-accent:#eeba30;--house-on-dark:#fff8e8;--navy:#ae0001;--navy2:#740001;--gold:#d3a625;--gold2:#eeba30}
+body.house-slytherin{--house-main:#2a623d;--house-secondary:#c0c0c0;--house-dark:#1a472a;--house-accent:#6c6e6a;--house-on-dark:#ffffff;--navy:#2a623d;--navy2:#1a472a;--gold:#8f9290;--gold2:#c0c0c0}
+body.house-ravenclaw{--house-main:#222f5b;--house-secondary:#8c6239;--house-dark:#0e1a40;--house-accent:#c0c0c0;--house-on-dark:#ffffff;--navy:#222f5b;--navy2:#0e1a40;--gold:#8c6239;--gold2:#c0c0c0}
+body.house-hufflepuff{--house-main:#f3c623;--house-secondary:#000000;--house-dark:#222222;--house-accent:#e8a317;--house-on-dark:#ffffff;--navy:#222222;--navy2:#000000;--gold:#e8a317;--gold2:#f3c623}
+
+body[class*="house-"] .topnav{background:linear-gradient(90deg,var(--house-dark),var(--house-main),var(--house-dark));border-top-color:var(--house-accent);border-bottom-color:var(--house-secondary)}
+body.house-hufflepuff .topnav{background:linear-gradient(90deg,#000,#222,#000);border-top-color:#f3c623;border-bottom-color:#e8a317}
+body[class*="house-"] .nav-item,body[class*="house-"] .profile{color:var(--house-on-dark)}
+body[class*="house-"] .nav-item:hover,body[class*="house-"] .nav-item.active{border-bottom-color:var(--house-accent);color:var(--house-on-dark)}
+body[class*="house-"] .side-panel{border-top-color:var(--house-main)}
+body[class*="house-"] .side-panel>button:hover,body[class*="house-"] .side-panel .side-active{box-shadow:inset 3px 0 var(--house-main);background:linear-gradient(90deg,#efe5cf,#fbf5e9)}
+body[class*="house-"] .welcome-card{border-top-color:var(--house-main)}
+body[class*="house-"] .welcome-card:before{color:var(--house-accent)}
+body[class*="house-"] .welcome-card h1,body[class*="house-"] .page-title h1,body[class*="house-"] .section-head h2,body[class*="house-"] .section-head h3,body[class*="house-"] .topic-section h2,body[class*="house-"] .song-group>h2,body[class*="house-"] .song-card h3{color:var(--house-dark)}
+body[class*="house-"] .page-title h1:after{background:linear-gradient(90deg,transparent,var(--house-main),transparent)}
+body[class*="house-"] .section-head h2:before,body[class*="house-"] .section-head h3:before{color:var(--house-main)}
+body[class*="house-"] .welcome-actions button,body[class*="house-"] .house-card button,body[class*="house-"] .profile-card button,body[class*="house-"] .coming button,body[class*="house-"] .checkbtn{
+  background:linear-gradient(var(--house-accent),var(--house-main));border-color:var(--house-dark);color:#fff;box-shadow:inset 0 1px #ffffff55
+}
+body.house-hufflepuff .welcome-actions button,body.house-hufflepuff .house-card button,body.house-hufflepuff .profile-card button,body.house-hufflepuff .coming button,body.house-hufflepuff .checkbtn{background:linear-gradient(#f3c623,#e8a317);border-color:#222;color:#111}
+body[class*="house-"] .welcome-actions .secondary{background:linear-gradient(#f7f3e7,#e6ddc9);border-color:var(--house-main);color:var(--house-dark)}
+body[class*="house-"] .unit-pill{background:var(--house-dark);color:var(--house-on-dark)}
+body[class*="house-"] .exercise-shell{border-color:var(--house-main)}
+body[class*="house-"] .exercise-head{border-bottom-color:var(--house-main)}
+body[class*="house-"] .difficulty,body[class*="house-"] .exercise-card .stars{color:var(--house-main)}
+body[class*="house-"] .exercise-card:hover,body[class*="house-"] .unit:hover,body[class*="house-"] .topic:hover,body[class*="house-"] .song-card:hover{border-color:var(--house-main)}
+body[class*="house-"] .song-toolbar{border-color:var(--house-secondary)}
+body[class*="house-"] .song-sort.active,body[class*="house-"] .song-sort:hover{background:var(--house-dark);color:var(--house-on-dark);border-color:var(--house-dark)}
+body[class*="house-"] .progress-card{border-top-color:var(--house-main)}
+body[class*="house-"] .house-card{border-top-color:var(--house-dark)}
+body[class*="house-"] .bar i,body[class*="house-"] .goalbar i{background:linear-gradient(90deg,var(--house-dark),var(--house-main))}
+body[class*="house-"] .crest{background:radial-gradient(circle,var(--house-accent),var(--house-main));border-color:var(--house-dark);color:var(--house-dark)}
+body.house-hufflepuff .crest{color:#111}
+body[class*="house-"] .badge.unlocked{box-shadow:inset 0 4px var(--house-main)}
+body[class*="house-"] .topic-section h2,body[class*="house-"] .song-group>h2{border-bottom-color:var(--house-main)}
+body[class*="house-"] .word-token{border-color:var(--house-main)}
+body[class*="house-"] .word-token.chosen{background:var(--house-dark);color:var(--house-on-dark)}
+
+/* Keep learning surfaces neutral and high-contrast regardless of House theme */
+body[class*="house-"] .question,body[class*="house-"] .reading-text,body[class*="house-"] .answer,body[class*="house-"] .clozeInput,body[class*="house-"] .clozeSelect,body[class*="house-"] .word-bank{color:#25261f;background:#fffaf0}
+body[class*="house-"] .question b,body[class*="house-"] .reading-text p{color:#25261f}
+
+@media(max-width:760px){
+  .teacher-preview-bar{gap:8px;padding:7px 8px}.teacher-preview-bar strong{width:100%;text-align:center}.teacher-preview-bar button{width:100%}
+  body.teacher-preview-mode .site-header{top:88px}
+}

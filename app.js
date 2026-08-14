@@ -3,6 +3,27 @@ const LOGIN_KEY='pp_current_role';
 const USERS_KEY='pp_users_v2';
 const CURRENT_USER_KEY='pp_current_user';
 
+// House-theme test accounts (not stored in the real student database)
+const TEST_ACCOUNTS={
+  gryffindor:{firstName:'Gryffindor',lastName:'Test',klass:'TEST',house:'Gryffindor',email:'',password:'G1',banned:false,isTest:true},
+  slytherin:{firstName:'Slytherin',lastName:'Test',klass:'TEST',house:'Slytherin',email:'',password:'S1',banned:false,isTest:true},
+  ravenclaw:{firstName:'Ravenclaw',lastName:'Test',klass:'TEST',house:'Ravenclaw',email:'',password:'R1',banned:false,isTest:true},
+  hufflepuff:{firstName:'Hufflepuff',lastName:'Test',klass:'TEST',house:'Hufflepuff',email:'',password:'H1',banned:false,isTest:true}
+};
+let teacherPreviewMode=false;
+let teacherPreviewHouse='Gryffindor';
+const HOUSE_THEME_CLASSES=['house-gryffindor','house-slytherin','house-ravenclaw','house-hufflepuff'];
+function applyHouseTheme(house){
+  document.body.classList.remove(...HOUSE_THEME_CLASSES);
+  const cls={Gryffindor:'house-gryffindor',Slytherin:'house-slytherin',Ravenclaw:'house-ravenclaw',Hufflepuff:'house-hufflepuff'}[house];
+  if(cls)document.body.classList.add(cls);
+}
+function clearHouseTheme(){document.body.classList.remove(...HOUSE_THEME_CLASSES)}
+function resolveUser(userId){
+  const id=String(userId||'');
+  return getUsers()[id]||TEST_ACCOUNTS[id.toLowerCase()]||null;
+}
+
 const HOUSE_POINTS_START = new Date(2026,8,1,0,0,0); // 1 September 2026
 const SCHOOL_MONTHS=['September','October','November','December','January','February','March','April','May','June'];
 
@@ -72,11 +93,15 @@ function addHousePoints(points,userId=activeUserId(),d=new Date()){
 
 function getUsers(){return JSON.parse(localStorage.getItem(USERS_KEY)||'{}')}
 function saveUsers(users){localStorage.setItem(USERS_KEY,JSON.stringify(users))}
-function activeUserId(){return localStorage.getItem(CURRENT_USER_KEY)||sessionStorage.getItem(CURRENT_USER_KEY)||''}
+function activeUserId(){
+  if(teacherPreviewMode)return '__teacher_preview__';
+  return localStorage.getItem(CURRENT_USER_KEY)||sessionStorage.getItem(CURRENT_USER_KEY)||'';
+}
 function userKey(name,userId=activeUserId()){return `pp_user_${encodeURIComponent(userId)}_${name}`}
 function currentProfile(){
-  const id=activeUserId(),u=getUsers()[id];
-  return u?{name:`${u.firstName} ${u.lastName}`,firstName:u.firstName,lastName:u.lastName,klass:u.klass,house:u.house,email:u.email,userId:id,banned:!!u.banned}:{};
+  if(teacherPreviewMode)return {name:'Teacher Preview',firstName:'Teacher',lastName:'Preview',klass:'Preview',house:teacherPreviewHouse,email:'',userId:'__teacher_preview__',banned:false};
+  const id=activeUserId(),u=resolveUser(id);
+  return u?{name:`${u.firstName} ${u.lastName}`,firstName:u.firstName,lastName:u.lastName,klass:u.klass,house:u.house,email:u.email,userId:id,banned:!!u.banned,isTest:!!u.isTest}:{};
 }
 function updateUser(userId,patch){
   const users=getUsers();if(!users[userId])return false;
@@ -138,12 +163,16 @@ function useGeneratedLogin(){
   showStudentAuth('login');
 }
 function studentLogin(){
-  const userId=normalizeName(document.getElementById('studentUserIdInput').value);
+  const typedUserId=normalizeName(document.getElementById('studentUserIdInput').value);
+  const testId=typedUserId.toLowerCase();
+  const isTest=!!TEST_ACCOUNTS[testId];
+  const userId=isTest?testId:typedUserId;
   const password=document.getElementById('studentPasswordInput').value||'';
   const remember=!!document.getElementById('studentRememberInput').checked;
-  const u=getUsers()[userId],fb=document.getElementById('studentLoginFeedback');fb.textContent='';
+  const u=resolveUser(userId),fb=document.getElementById('studentLoginFeedback');fb.textContent='';
   if(!u||u.password!==password){fb.textContent='Incorrect User ID or password.';return}
   if(u.banned){fb.textContent='This account has been disabled by the teacher.';return}
+  teacherPreviewMode=false;
   localStorage.removeItem(CURRENT_USER_KEY);sessionStorage.removeItem(CURRENT_USER_KEY);
   localStorage.removeItem(LOGIN_KEY);sessionStorage.removeItem(LOGIN_KEY);
   const store=remember?localStorage:sessionStorage;
@@ -172,6 +201,7 @@ function openStudentApp(){
   document.getElementById('teacherApp').classList.add('hidden');
   document.getElementById('studentApp').classList.remove('hidden');
   const p=currentProfile();
+  applyHouseTheme(p.house||'Gryffindor');
   document.getElementById('studentProfileName').textContent=p.name||'Student';
   document.getElementById('studentProfileMeta').textContent=`${p.klass||'—'} · ${p.house||'Gryffindor'}`;
   document.getElementById('welcomeStudent').textContent=`Welcome back, ${p.name||'Student'}!`;
@@ -179,7 +209,44 @@ function openStudentApp(){
   document.getElementById('housePageTitle').textContent=p.house||'My House';
   go('home'); refresh();
 }
+function openTeacherPreview(house='Gryffindor'){
+  teacherPreviewMode=true;
+  teacherPreviewHouse=house;
+  const sel=document.getElementById('teacherPreviewHouse');if(sel)sel.value=house;
+  openStudentApp();
+  document.body.classList.remove('student-mode');
+  document.body.classList.add('teacher-preview-mode');
+  document.getElementById('studentWatermark')?.classList.add('hidden');
+  document.getElementById('teacherPreviewBar')?.classList.remove('hidden');
+}
+function setPreviewHouse(house){
+  if(!['Gryffindor','Slytherin','Ravenclaw','Hufflepuff'].includes(house))return;
+  teacherPreviewHouse=house;
+  applyHouseTheme(house);
+  const p=currentProfile();
+  document.getElementById('studentProfileMeta').textContent=`Preview · ${p.house}`;
+  document.getElementById('studentHouseDisplay').textContent=p.house;
+  document.getElementById('housePageTitle').textContent=p.house;
+  refresh();
+}
+function exitTeacherPreview(){
+  teacherPreviewMode=false;
+  document.body.classList.remove('teacher-preview-mode','student-mode');
+  clearHouseTheme();
+  document.getElementById('teacherPreviewBar')?.classList.add('hidden');
+  document.getElementById('studentWatermark')?.classList.add('hidden');
+  document.getElementById('studentApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('teacherApp').classList.remove('hidden');
+  PAGE_HISTORY.length=0;
+  refreshTeacher();
+  teacherMonth('September');
+}
 function openTeacherApp(){
+  teacherPreviewMode=false;
+  document.body.classList.remove('teacher-preview-mode');
+  clearHouseTheme();
+  document.getElementById('teacherPreviewBar')?.classList.add('hidden');
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('studentApp').classList.add('hidden');
   document.getElementById('teacherApp').classList.remove('hidden');
@@ -468,6 +535,7 @@ function checkExercise(){
  }
  let pct=Math.round(correct/total*100);
  document.getElementById('feedback').innerHTML=`<div class="scorebox"><h2>${correct}/${total} · ${pct}%</h2><p>${pct>=85?'Excellent!':pct>=60?'Well done!':'Good try! Check your answers and try again.'}</p></div>`;
+ if(teacherPreviewMode)return;
  let at=attempts(); at[e.id]=(at[e.id]||0)+1; localStorage.setItem(userKey('attempts'),JSON.stringify(at));
  let earned=0;
  if(housePointsSeasonOpen()){
@@ -504,7 +572,7 @@ function refresh(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   const role=localStorage.getItem(LOGIN_KEY)||sessionStorage.getItem(LOGIN_KEY);
-  if(role==='student'&&activeUserId()&&getUsers()[activeUserId()])openStudentApp();
+  if(role==='student'&&activeUserId()&&resolveUser(activeUserId()))openStudentApp();
   else if(role==='teacher')openTeacherApp();
   else{
     document.getElementById('loginScreen').classList.remove('hidden');
@@ -604,8 +672,8 @@ const oldOpenStudent=openStudentApp;openStudentApp=function(){
  oldOpenStudent();document.body.classList.add('student-mode');
  const w=document.getElementById('studentWatermark');w.textContent=`${p.name||'Student'} · ${p.klass||''}`;w.classList.remove('hidden')
 }
-const oldOpenTeacher=openTeacherApp;openTeacherApp=function(){document.body.classList.remove('student-mode');document.getElementById('studentWatermark')?.classList.add('hidden');oldOpenTeacher()}
-const oldLogout=logout;logout=function(){document.body.classList.remove('student-mode');document.getElementById('studentWatermark')?.classList.add('hidden');oldLogout()}
+const oldOpenTeacher=openTeacherApp;openTeacherApp=function(){document.body.classList.remove('student-mode','teacher-preview-mode');document.getElementById('studentWatermark')?.classList.add('hidden');clearHouseTheme();oldOpenTeacher()}
+const oldLogout=logout;logout=function(){teacherPreviewMode=false;document.body.classList.remove('student-mode','teacher-preview-mode');document.getElementById('studentWatermark')?.classList.add('hidden');document.getElementById('teacherPreviewBar')?.classList.add('hidden');clearHouseTheme();oldLogout()}
 document.addEventListener('contextmenu',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
 document.addEventListener('copy',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
 document.addEventListener('cut',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});

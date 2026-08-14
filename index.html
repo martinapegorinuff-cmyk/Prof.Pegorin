@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prof. Pegorin English</title>
-<link rel="stylesheet" href="style.css?v=146">
+<link rel="stylesheet" href="style.css?v=150">
 </head>
 <body>
 
@@ -115,6 +115,15 @@
 </section>
 
 <div id="studentApp" class="hidden">
+<div id="teacherPreviewBar" class="teacher-preview-bar hidden">
+  <strong>Teacher Preview Mode</strong>
+  <label>House theme
+    <select id="teacherPreviewHouse" onchange="setPreviewHouse(this.value)">
+      <option>Gryffindor</option><option>Slytherin</option><option>Ravenclaw</option><option>Hufflepuff</option>
+    </select>
+  </label>
+  <button onclick="exitTeacherPreview()">← Back to Teacher Dashboard</button>
+</div>
 <header class="site-header">
   <div class="banner-wrap"><img src="assets/banner.png" class="banner" alt="Prof. Pegorin"></div>
   <nav class="topnav">
@@ -284,6 +293,7 @@
       <button class="teacher-tab" onclick="teacherSection('housesTeacher',this)">♛ House Points</button>
       <button class="teacher-tab" onclick="teacherSection('resultsTeacher',this)">▥ Exercise Results</button>
       <button class="teacher-tab" onclick="teacherSection('mistakesTeacher',this)">⚠ Common Mistakes</button>
+      <button class="teacher-preview-launch" onclick="openTeacherPreview('Gryffindor')">◉ View Student Site</button>
     </aside>
 
     <section class="teacher-content">
@@ -352,8 +362,8 @@
 </main>
 </div>
 
-<script src="exercises.js?v=142"></script>
+<script src="exercises.js?v=150"></script>
 <div id="studentWatermark" class="watermark hidden"></div>
-<script src="app.js?v=144"></script>
+<script src="app.js?v=150"></script>
 </body>
 </html>
