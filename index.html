@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prof. Pegorin English</title>
-<link rel="stylesheet" href="style.css?v=122">
+<link rel="stylesheet" href="style.css?v=130">
 </head>
 <body>
 
@@ -121,6 +121,7 @@
     <button onclick="go('home')" class="nav-item active">⌂ <span>HOME</span></button>
     <button onclick="go('topics')" class="nav-item">✦ <span>PRACTICE BY TOPIC</span></button>
     <button onclick="go('units')" class="nav-item">▦ <span>PRACTICE BY UNIT</span></button>
+    <button onclick="go('songs')" class="nav-item">♫ <span>VOCABULARY SONGS</span></button>
     <button onclick="go('badges')" class="nav-item">★ <span>BADGES</span></button>
     <button onclick="go('houses')" class="nav-item">♛ <span>HOUSE POINTS</span></button>
     <button onclick="go('progress')" class="nav-item">▥ <span>MY PROGRESS</span></button>
@@ -139,6 +140,7 @@
       <button onclick="go('home')">⌂ My Dashboard</button>
       <button onclick="go('topics')">✦ Practice by Topic</button>
       <button onclick="go('units')">▦ Practice by Unit</button>
+      <button onclick="go('songs')">♫ Vocabulary Songs</button>
       <button onclick="go('progress')">▥ My Results</button>
       <button onclick="go('badges')">★ Badges & Achievements</button>
       <button onclick="go('houses')">♛ My House</button>
@@ -176,6 +178,10 @@
           <img src="assets/topic_revision.png" alt="Revision">
           <div class="topic-card-copy"><h3>REVISION</h3><p>Mix topics and check what you remember.</p></div>
         </article>
+        <article onclick="go('songs')" class="illustrated-card">
+          <img src="assets/topic_songs.png" alt="Vocabulary songs">
+          <div class="topic-card-copy"><h3>VOCABULARY SONGS</h3><p>Listen, sing and review vocabulary.</p></div>
+        </article>
       </div>
     </div>
 
@@ -201,6 +207,7 @@
     <button onclick="showCategory('Grammar')"><img src="assets/topic_grammar.png" alt=""><span><b>GRAMMAR</b><small>Units 1–3 grammar practice</small></span></button>
     <button onclick="showCategory('Reading Comprehension')"><img src="assets/topic_reading.png" alt=""><span><b>READING</b><small>Reading comprehension</small></span></button>
     <button onclick="showCategory('Revision')"><img src="assets/topic_revision.png" alt=""><span><b>REVISION</b><small>Units 1–3 revision</small></span></button>
+    <button onclick="go('songs')"><img src="assets/topic_songs.png" alt=""><span><b>VOCABULARY SONGS</b><small>Listen and review vocabulary by song</small></span></button>
   </div>
   <div id="topicList"></div>
 </section>
@@ -208,11 +215,22 @@
 <section id="units" class="page">
   <div class="page-title"><h1>Practice by Unit</h1><p>Choose a unit.</p></div>
   <div class="unit-grid">
-    <div class="unit" onclick="showUnit1()"><b>Unit 1</b><span>Countries & nationalities · be · question words · possessives</span></div>
-    <div class="unit" onclick="showUnit2()"><b>Unit 2</b><span>Family · appearance · have got · demonstratives · possessive ’s</span></div>
-    <div class="unit" onclick="showUnit3()"><b>Unit 3</b><span>Rooms & furniture · prepositions · there is/are · some/any · plurals</span></div>
+    <div id="unitCard1" class="unit" data-unit="1" onclick="showUnit1()"><b>Unit 1</b><span>Countries & nationalities · be · question words · possessives</span></div>
+    <div id="unitCard2" class="unit" data-unit="2" onclick="showUnit2()"><b>Unit 2</b><span>Family · appearance · have got · demonstratives · possessive ’s</span></div>
+    <div id="unitCard3" class="unit" data-unit="3" onclick="showUnit3()"><b>Unit 3</b><span>Rooms & furniture · prepositions · there is/are · some/any · plurals</span></div>
   </div>
   <div id="unitDetail"></div>
+</section>
+
+<section id="songs" class="page">
+  <div class="page-title"><h1>Vocabulary Songs</h1><p>Listen, sing and review the vocabulary.</p></div>
+  <div class="song-toolbar" role="group" aria-label="Choose song order">
+    <span>View by:</span>
+    <button id="songSortTitle" class="song-sort active" onclick="renderSongs('title')">By Title</button>
+    <button id="songSortTopic" class="song-sort" onclick="renderSongs('topic')">By Topic</button>
+    <button id="songSortUnit" class="song-sort" onclick="renderSongs('unit')">By Unit</button>
+  </div>
+  <div id="songsList"></div>
 </section>
 
 <section id="exercise" class="page"><div id="exerciseBox"></div></section>
@@ -244,7 +262,7 @@
   </div>
 </div>
 
-<footer><span>Prof. Pegorin English · Units 1–3 prototype v1.2.2</span></footer>
+<footer><span>Prof. Pegorin English · Units 1–3 prototype v1.3.0</span></footer>
 </div>
 
 <div id="teacherApp" class="hidden">
@@ -262,6 +280,7 @@
       <h3>TEACHER AREA</h3>
       <button class="teacher-tab active" onclick="teacherSection('overview',this)">⌂ Overview</button>
       <button class="teacher-tab" onclick="teacherSection('students',this)">♙ Students</button>
+      <button class="teacher-tab" onclick="teacherSection('unitAccessTeacher',this)">🔒 Unit Access</button>
       <button class="teacher-tab" onclick="teacherSection('housesTeacher',this)">♛ House Points</button>
       <button class="teacher-tab" onclick="teacherSection('resultsTeacher',this)">▥ Exercise Results</button>
       <button class="teacher-tab" onclick="teacherSection('mistakesTeacher',this)">⚠ Common Mistakes</button>
@@ -289,6 +308,14 @@
             <thead><tr><th>Cognome e nome</th><th>User ID</th><th>Password</th><th>Class</th><th>House</th><th>Email scolastica</th><th>Completed</th><th>Average</th><th>Admin</th></tr></thead>
             <tbody id="teacherStudentsTable"></tbody>
           </table>
+        </div>
+      </div>
+
+      <div id="unitAccessTeacher" class="teacher-section">
+        <div class="teacher-title"><h2>Unit Access</h2><p>Lock or unlock each unit for students.</p></div>
+        <div class="teacher-card">
+          <div class="unit-access-note"><b>Prototype note:</b> on static GitHub Pages, this setting is saved only in this browser/device. A shared backend will be needed for locks changed here to affect students on other devices.</div>
+          <div id="teacherUnitAccessGrid" class="teacher-unit-access-grid"></div>
         </div>
       </div>
 
@@ -333,8 +360,8 @@
 </main>
 </div>
 
-<script src="exercises.js?v=122"></script>
+<script src="exercises.js?v=130"></script>
 <div id="studentWatermark" class="watermark hidden"></div>
-<script src="app.js?v=122"></script>
+<script src="app.js?v=130"></script>
 </body>
 </html>

@@ -6,6 +6,69 @@ const CURRENT_USER_KEY='pp_current_user';
 const HOUSE_POINTS_START = new Date(2026,8,1,0,0,0); // 1 September 2026
 const SCHOOL_MONTHS=['September','October','November','December','January','February','March','April','May','June'];
 
+const UNIT_ACCESS_KEY='pp_unit_access_v1';
+const ALL_UNITS=[1,2,3,4,5,6,7,8];
+const DEFAULT_UNIT_ACCESS={1:true,2:true,3:true,4:false,5:false,6:false,7:false,8:false};
+const VOCAB_SONGS=[
+  {id:'song_u1_countries',title:'Where Are You From?',topic:'Countries & Nationalities',unit:1,src:'assets/songs/where_are_you_from.mp4'},
+  {id:'song_u2_family',title:"Who's Who?",topic:'Family',unit:2,src:'assets/songs/whos_who.mp4'},
+  {id:'song_u2_appearance',title:'Look Again',topic:'Physical Appearance',unit:2,src:'assets/songs/look_again.mp4'}
+];
+function getUnitAccess(){
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem(UNIT_ACCESS_KEY)||'{}')||{}}catch(e){saved={}}
+  return {...DEFAULT_UNIT_ACCESS,...saved};
+}
+function isUnitUnlocked(unit){return !!getUnitAccess()[Number(unit)]}
+function setUnitUnlocked(unit,unlocked){
+  const data=getUnitAccess();data[Number(unit)]=!!unlocked;
+  localStorage.setItem(UNIT_ACCESS_KEY,JSON.stringify(data));
+  updateUnitAccessUI();renderTeacherUnitAccess();
+  if(document.getElementById('songs')?.classList.contains('active')) renderSongs(currentSongSort);
+}
+function toggleUnitAccess(unit){setUnitUnlocked(unit,!isUnitUnlocked(unit))}
+function lockedUnitMessage(unit){
+  return `<div class="locked-content"><div class="lock-symbol">🔒</div><h2>Unit ${unit} is locked</h2><p>Your teacher will unlock this unit when it is time to use it.</p></div>`;
+}
+function updateUnitAccessUI(){
+  document.querySelectorAll('.unit[data-unit]').forEach(el=>{
+    const n=Number(el.dataset.unit), unlocked=isUnitUnlocked(n);
+    el.classList.toggle('locked-unit',!unlocked);
+    let badge=el.querySelector('.unit-lock-label');
+    if(!badge){badge=document.createElement('small');badge.className='unit-lock-label';el.appendChild(badge)}
+    badge.textContent=unlocked?'Unlocked':'🔒 Locked';
+  });
+}
+function renderTeacherUnitAccess(){
+  const grid=document.getElementById('teacherUnitAccessGrid');if(!grid)return;
+  grid.innerHTML=ALL_UNITS.map(n=>{
+    const unlocked=isUnitUnlocked(n);
+    return `<div class="teacher-unit-access ${unlocked?'is-unlocked':'is-locked'}"><div><b>Unit ${n}</b><span>${unlocked?'Unlocked for students':'Locked for students'}</span></div><button onclick="toggleUnitAccess(${n})">${unlocked?'Lock':'Unlock'}</button></div>`;
+  }).join('');
+}
+let currentSongSort='title';
+function songCard(song){
+  return `<article class="song-card"><div class="song-meta"><span class="unit-pill">Unit ${song.unit}</span><span>${song.topic}</span></div><h3>${song.title}</h3><video controls preload="metadata" playsinline src="${song.src}">Your browser does not support video playback.</video></article>`;
+}
+function renderSongs(mode=currentSongSort){
+  currentSongSort=mode;
+  document.querySelectorAll('.song-sort').forEach(b=>b.classList.remove('active'));
+  const active={title:'songSortTitle',topic:'songSortTopic',unit:'songSortUnit'}[mode];document.getElementById(active)?.classList.add('active');
+  const box=document.getElementById('songsList');if(!box)return;
+  const songs=VOCAB_SONGS.filter(s=>isUnitUnlocked(s.unit));
+  if(!songs.length){box.innerHTML='<div class="locked-content"><div class="lock-symbol">♫</div><h2>No songs available yet</h2><p>Your teacher will unlock songs together with their units.</p></div>';return}
+  if(mode==='unit'){
+    const groups=[...new Set(songs.map(s=>s.unit))].sort((a,b)=>a-b);
+    box.innerHTML=groups.map(u=>`<section class="song-group"><h2>Unit ${u}</h2><div class="song-grid">${songs.filter(s=>s.unit===u).sort((a,b)=>a.title.localeCompare(b.title,'en')).map(songCard).join('')}</div></section>`).join('');
+  }else if(mode==='topic'){
+    const ordered=[...songs].sort((a,b)=>a.topic.localeCompare(b.topic,'en')||a.title.localeCompare(b.title,'en'));
+    box.innerHTML=`<div class="song-grid">${ordered.map(songCard).join('')}</div>`;
+  }else{
+    const ordered=[...songs].sort((a,b)=>a.title.localeCompare(b.title,'en'));
+    box.innerHTML=`<div class="song-grid">${ordered.map(songCard).join('')}</div>`;
+  }
+}
+
 function housePointsSeasonOpen(d=new Date()){return d>=HOUSE_POINTS_START}
 function monthName(d=new Date()){return d.toLocaleString('en-US',{month:'long'})}
 function getHousePointMonths(userId=activeUserId()){
@@ -152,6 +215,7 @@ function openTeacherApp(){
   teacherMonth('September');
 }
 function teacherSection(id,btn){
+  if(id==='unitAccessTeacher')renderTeacherUnitAccess();
   document.querySelectorAll('.teacher-section').forEach(x=>x.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.teacher-tab').forEach(x=>x.classList.remove('active'));
@@ -278,6 +342,7 @@ function refreshTeacher(){
     </tr>`);
   }));
   document.getElementById('teacherResultsTable').innerHTML=rows.length?rows.join(''):'<tr><td colspan="5">No exercise results saved yet.</td></tr>';
+  renderTeacherUnitAccess();
 }
 
 
@@ -301,10 +366,14 @@ function stars(n){return '★'.repeat(n)}
 function allExercises(){return Object.entries(DB).flatMap(([cat,arr])=>arr.map(e=>({...e,unit:e.unit||1,cat})))}
 function showCategory(cat){
  go('topics');
- const list=(DB[cat]||[]).map(e=>card(e,cat)).join('');
- document.getElementById('topicList').innerHTML=`<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${list}</div></section>`;
+ const available=(DB[cat]||[]).filter(e=>isUnitUnlocked(e.unit||1));
+ const list=available.map(e=>card(e,cat)).join('');
+ document.getElementById('topicList').innerHTML=available.length
+   ? `<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${list}</div></section>`
+   : `<section class="topic-section"><h2>${cat}</h2><div class="locked-content"><div class="lock-symbol">🔒</div><h2>No unlocked exercises here yet</h2><p>Your teacher will make more content available as you move through the units.</p></div></section>`;
 }
 function renderUnit(n){
+ if(!isUnitUnlocked(n)){document.getElementById('unitDetail').innerHTML=lockedUnitMessage(n);return;}
  const cats=Object.keys(DB);
  document.getElementById('unitDetail').innerHTML=cats.map(cat=>{
    const es=(DB[cat]||[]).filter(e=>(e.unit||1)===n);
@@ -327,7 +396,7 @@ function card(e,cat){
 }
 function completed(id){return !!JSON.parse(localStorage.getItem(userKey('results'))||'{}')[id]}
 function openExercise(cat,id){
- const e=DB[cat].find(x=>x.id===id); window.current={...e,cat};
+ const e=DB[cat].find(x=>x.id===id); if(!e)return; if(!isUnitUnlocked(e.unit||1)){go('units');document.getElementById('unitDetail').innerHTML=lockedUnitMessage(e.unit||1);return;} window.current={...e,cat};
  go('exercise'); renderExercise(e,cat);
 }
 function renderExercise(e,cat){
@@ -444,6 +513,8 @@ function refresh(){
  const results=JSON.parse(localStorage.getItem(userKey('results'))||'{}');const hp=schoolYearHousePoints();
  ['housePoints','housePoints2'].forEach(id=>{let x=document.getElementById(id);if(x)x.textContent=hp});let dc=document.getElementById('doneCount');if(dc)dc.textContent=Object.keys(results).length;
  let rb=document.getElementById('resultsBox');if(rb)rb.innerHTML=Object.values(results).length?Object.values(results).map(r=>`<p><b>${r.title}</b> — ${r.score}/${r.total} (${r.pct}%)</p>`).join(''):'<p>No exercises completed yet.</p>';
+ updateUnitAccessUI();
+ if(document.getElementById('songs')?.classList.contains('active'))renderSongs(currentSongSort);
 }
 
 

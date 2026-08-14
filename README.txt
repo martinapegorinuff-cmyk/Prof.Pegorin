@@ -135,3 +135,13 @@ v1.2.2
 - House Point attempt counting also begins on 1 September, so August practice does not reduce September earning opportunities.
 - House Points are now stored by month. September, October, etc. no longer display the same all-time total.
 - Legacy prototype House Point totals are ignored; the 2026/27 House competition starts cleanly from September.
+
+v1.3.0
+- Added a new Vocabulary Songs section with the approved watercolor music cover.
+- Added three MP4 vocabulary songs: Where Are You From? (Unit 1 · Countries & Nationalities), Who's Who? (Unit 2 · Family), Look Again (Unit 2 · Physical Appearance).
+- Songs can be displayed alphabetically by title, alphabetically by semantic topic, or grouped by unit.
+- Songs belonging to locked units are hidden from students until the unit is unlocked.
+- Added Teacher/Admin “Unit Access” controls for Units 1–8.
+- Units 1–3 are unlocked by default; Units 4–8 are locked by default.
+- Locked units cannot be opened from Practice by Unit, Practice by Topic, or direct exercise calls.
+IMPORTANT: because this is still a static GitHub Pages/localStorage prototype, Unit Access changes are saved only on the browser/device where the teacher changes them. To control access for students on other devices, the same setting will need to be moved to the future shared backend/database.
