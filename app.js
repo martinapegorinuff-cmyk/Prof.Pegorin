@@ -6,46 +6,9 @@ const CURRENT_USER_KEY='pp_current_user';
 const HOUSE_POINTS_START = new Date(2026,8,1,0,0,0); // 1 September 2026
 const SCHOOL_MONTHS=['September','October','November','December','January','February','March','April','May','June'];
 
-const UNIT_ACCESS_KEY='pp_unit_access_v1';
-const ALL_UNITS=[1,2,3,4,5,6,7,8];
-const DEFAULT_UNIT_ACCESS={1:true,2:true,3:true,4:false,5:false,6:false,7:false,8:false};
-const VOCAB_SONGS=[
-  {id:'song_u1_countries',title:'Where Are You From?',topic:'Countries & Nationalities',unit:1,src:'assets/songs/where_are_you_from.mp4'},
-  {id:'song_u2_family',title:"Who's Who?",topic:'Family',unit:2,src:'assets/songs/whos_who.mp4'},
-  {id:'song_u2_appearance',title:'Look Again',topic:'Physical Appearance',unit:2,src:'assets/songs/look_again.mp4'}
-];
-function getUnitAccess(){
-  let saved={};
-  try{saved=JSON.parse(localStorage.getItem(UNIT_ACCESS_KEY)||'{}')||{}}catch(e){saved={}}
-  return {...DEFAULT_UNIT_ACCESS,...saved};
-}
-function isUnitUnlocked(unit){return !!getUnitAccess()[Number(unit)]}
-function setUnitUnlocked(unit,unlocked){
-  const data=getUnitAccess();data[Number(unit)]=!!unlocked;
-  localStorage.setItem(UNIT_ACCESS_KEY,JSON.stringify(data));
-  updateUnitAccessUI();renderTeacherUnitAccess();
-  if(document.getElementById('songs')?.classList.contains('active')) renderSongs(currentSongSort);
-}
-function toggleUnitAccess(unit){setUnitUnlocked(unit,!isUnitUnlocked(unit))}
-function lockedUnitMessage(unit){
-  return `<div class="locked-content"><div class="lock-symbol">🔒</div><h2>Unit ${unit} is locked</h2><p>Your teacher will unlock this unit when it is time to use it.</p></div>`;
-}
-function updateUnitAccessUI(){
-  document.querySelectorAll('.unit[data-unit]').forEach(el=>{
-    const n=Number(el.dataset.unit), unlocked=isUnitUnlocked(n);
-    el.classList.toggle('locked-unit',!unlocked);
-    let badge=el.querySelector('.unit-lock-label');
-    if(!badge){badge=document.createElement('small');badge.className='unit-lock-label';el.appendChild(badge)}
-    badge.textContent=unlocked?'Unlocked':'🔒 Locked';
-  });
-}
-function renderTeacherUnitAccess(){
-  const grid=document.getElementById('teacherUnitAccessGrid');if(!grid)return;
-  grid.innerHTML=ALL_UNITS.map(n=>{
-    const unlocked=isUnitUnlocked(n);
-    return `<div class="teacher-unit-access ${unlocked?'is-unlocked':'is-locked'}"><div><b>Unit ${n}</b><span>${unlocked?'Unlocked for students':'Locked for students'}</span></div><button onclick="toggleUnitAccess(${n})">${unlocked?'Lock':'Unlock'}</button></div>`;
-  }).join('');
-}
+function isUnitUnlocked(unit){return true}
+function updateUnitAccessUI(){}
+function renderTeacherUnitAccess(){}
 let currentSongSort='title';
 function songCard(song){
   return `<article class="song-card"><div class="song-meta"><span class="unit-pill">Unit ${song.unit}</span><span>${song.topic}</span></div><h3>${song.title}</h3><video controls preload="metadata" playsinline src="${song.src}">Your browser does not support video playback.</video></article>`;
@@ -55,7 +18,7 @@ function renderSongs(mode=currentSongSort){
   document.querySelectorAll('.song-sort').forEach(b=>b.classList.remove('active'));
   const active={title:'songSortTitle',topic:'songSortTopic',unit:'songSortUnit'}[mode];document.getElementById(active)?.classList.add('active');
   const box=document.getElementById('songsList');if(!box)return;
-  const songs=VOCAB_SONGS.filter(s=>isUnitUnlocked(s.unit));
+  const songs=[...VOCAB_SONGS];
   if(!songs.length){box.innerHTML='<div class="locked-content"><div class="lock-symbol">♫</div><h2>No songs available yet</h2><p>Your teacher will unlock songs together with their units.</p></div>';return}
   if(mode==='unit'){
     const groups=[...new Set(songs.map(s=>s.unit))].sort((a,b)=>a-b);
@@ -366,15 +329,14 @@ function stars(n){return '★'.repeat(n)}
 function allExercises(){return Object.entries(DB).flatMap(([cat,arr])=>arr.map(e=>({...e,unit:e.unit||1,cat})))}
 function showCategory(cat){
  go('topics');
- const available=(DB[cat]||[]).filter(e=>isUnitUnlocked(e.unit||1));
+ const available=(DB[cat]||[]);
  const list=available.map(e=>card(e,cat)).join('');
  document.getElementById('topicList').innerHTML=available.length
    ? `<section class="topic-section"><h2>${cat}</h2><div class="exercise-grid">${list}</div></section>`
    : `<section class="topic-section"><h2>${cat}</h2><div class="locked-content"><div class="lock-symbol">🔒</div><h2>No unlocked exercises here yet</h2><p>Your teacher will make more content available as you move through the units.</p></div></section>`;
 }
 function renderUnit(n){
- if(!isUnitUnlocked(n)){document.getElementById('unitDetail').innerHTML=lockedUnitMessage(n);return;}
- const cats=Object.keys(DB);
+  const cats=Object.keys(DB);
  document.getElementById('unitDetail').innerHTML=cats.map(cat=>{
    const es=(DB[cat]||[]).filter(e=>(e.unit||1)===n);
    if(!es.length)return '';
@@ -384,6 +346,7 @@ function renderUnit(n){
 function showUnit1(){renderUnit(1)}
 function showUnit2(){renderUnit(2)}
 function showUnit3(){renderUnit(3)}
+function showUnit4(){renderUnit(4)}
 function card(e,cat){
  const unit=e.unit||1;
  const r=JSON.parse(localStorage.getItem(userKey('results'))||'{}')[e.id];
@@ -396,7 +359,7 @@ function card(e,cat){
 }
 function completed(id){return !!JSON.parse(localStorage.getItem(userKey('results'))||'{}')[id]}
 function openExercise(cat,id){
- const e=DB[cat].find(x=>x.id===id); if(!e)return; if(!isUnitUnlocked(e.unit||1)){go('units');document.getElementById('unitDetail').innerHTML=lockedUnitMessage(e.unit||1);return;} window.current={...e,cat};
+ const e=DB[cat].find(x=>x.id===id); if(!e)return; window.current={...e,cat};
  go('exercise'); renderExercise(e,cat);
 }
 function renderExercise(e,cat){
@@ -409,6 +372,7 @@ function renderExercise(e,cat){
  if(e.text)h+=`<div class="reading-text">${e.text.split('\\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
  if(e.type==='cloze')h+=renderCloze(e);
  else if(e.type==='cloze_mcq')h+=renderClozeMcq(e);
+ else if(e.type==='reorder')h+=renderReorder(e);
  else if(e.type==='match')h+=renderMatch(e);
  else if(e.type==='multi')h+=renderMulti(e);
  else if(e.type==='demonstrative_mcq')h+=renderDemonstratives(e,true);
@@ -422,6 +386,12 @@ function renderStandard(e){return `<div class="questions">${e.items.map((it,i)=>
  if(opts)return `<div class="question" data-i="${i}"><b>${i+1}. ${q}</b><div class="options">${opts.map(o=>`<label><input type="radio" name="q${i}" value="${esc(o)}"> ${o}</label>`).join('')}</div></div>`;
  return `<div class="question" data-i="${i}"><b>${i+1}. ${q}</b><input class="answer" type="text" autocomplete="off"></div>`
  }).join('')}</div>`}
+
+function renderReorder(e){return `<div class="questions">${e.items.map((it,i)=>`<div class="question reorder-question" data-i="${i}"><b>${i+1}. ${it[0]}</b><div class="reorder-answer" data-answer=""></div><div class="reorder-bank">${shuffle(it[1]).map((w,j)=>`<button type="button" class="word-token" onclick="reorderAdd(this)">${w}</button>`).join('')}</div><button type="button" class="reorder-reset" onclick="reorderReset(this)">Reset</button></div>`).join('')}</div>`}
+function reorderAdd(btn){const q=btn.closest('.reorder-question'),a=q.querySelector('.reorder-answer');const token=document.createElement('button');token.type='button';token.className='word-token chosen';token.textContent=btn.textContent;token.onclick=function(){const bank=q.querySelector('.reorder-bank');const back=document.createElement('button');back.type='button';back.className='word-token';back.textContent=this.textContent;back.onclick=function(){reorderAdd(this)};bank.appendChild(back);this.remove();updateReorder(q)};a.appendChild(token);btn.remove();updateReorder(q)}
+function updateReorder(q){q.querySelector('.reorder-answer').dataset.answer=[...q.querySelectorAll('.reorder-answer .word-token')].map(x=>x.textContent).join(' ')}
+function reorderReset(btn){const q=btn.closest('.reorder-question'),bank=q.querySelector('.reorder-bank'),ans=q.querySelector('.reorder-answer');[...ans.querySelectorAll('.word-token')].forEach(x=>{const b=document.createElement('button');b.type='button';b.className='word-token';b.textContent=x.textContent;b.onclick=function(){reorderAdd(this)};bank.appendChild(b)});ans.innerHTML='';updateReorder(q)}
+
 function renderMatch(e){return `<div class="questions">${e.items.map((it,i)=>`<div class="question"><b>${i+1}. ${it[0]}</b><select class="answer"><option value="">Choose...</option>${shuffle(e.items.map(x=>x[1])).map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('')}</div>`}
 function renderMulti(e){return `<div class="questions">${e.items.map((it,i)=>`<div class="question"><b>${i+1}. ${it[0]}</b><div class="multiinputs">${it[1].map(()=>`<input class="answer" type="text">`).join('')}</div></div>`).join('')}</div>`}
 function renderCloze(e){let n=0;let t=e.text.replace(/___/g,()=>`<input class="clozeInput" data-i="${n++}" type="text">`);return `<div class="reading-text cloze">${t}</div>`}
@@ -472,9 +442,11 @@ function checkExercise(){
    const qs=[...document.querySelectorAll('.question')];total=e.items.length;
    qs.forEach((q,i)=>{let val;
      if(e.type==='mcq'||e.type==='reading'||e.type==='demonstrative_mcq'){val=q.querySelector('input:checked')?.value||''}
+     else if(e.type==='reorder'){val=q.querySelector('.reorder-answer')?.dataset.answer||''}
      else{val=q.querySelector('.answer')?.value||''}
      let ans;
-     if(e.type==='match') ans=e.items[i][1];
+     if(e.type==='reorder') ans=e.items[i][2];
+     else if(e.type==='match') ans=e.items[i][1];
      else if(e.type==='mcq'||e.type==='reading') ans=e.items[i][2];
      else if(e.type==='demonstrative_mcq') ans=e.items[i][5];
      else if(e.type==='demonstrative_text') ans=e.items[i][4];
@@ -565,7 +537,11 @@ function badgeData(){
   ['Unit 3 · Vocabulary Explorer','Perfect score in every Unit 3 Vocabulary exercise',allPerfect(3,'Vocabulary'),'badge_u3_vocabulary.png'],
   ['Unit 3 · Grammar Master','Perfect score in every Unit 3 Grammar exercise',allPerfect(3,'Grammar'),'badge_u3_grammar.png'],
   ['Unit 3 · Reading Explorer','Perfect score in every Unit 3 Reading exercise',allPerfect(3,'Reading Comprehension'),'badge_u3_reading.png'],
-  ['Unit 3 · Revision Master','Perfect score in every Unit 3 Revision exercise',allPerfect(3,'Revision'),'badge_u3_revision.png']
+  ['Unit 3 · Revision Master','Perfect score in every Unit 3 Revision exercise',allPerfect(3,'Revision'),'badge_u3_revision.png'],
+  ['Unit 4 · Vocabulary Explorer','Perfect score in every Unit 4 Vocabulary exercise',allPerfect(4,'Vocabulary'),'badge_u4_vocabulary.png'],
+  ['Unit 4 · Grammar Master','Perfect score in every Unit 4 Grammar exercise',allPerfect(4,'Grammar'),'badge_u4_grammar.png'],
+  ['Unit 4 · Reading Explorer','Perfect score in the Unit 4 Reading exercise',allPerfect(4,'Reading Comprehension'),'badge_u4_reading.png'],
+  ['Unit 4 · Revision Master','Perfect score in every Unit 4 Revision exercise',allPerfect(4,'Revision'),'badge_u4_revision.png']
  ];
 }
 function renderBadges(){
