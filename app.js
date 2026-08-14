@@ -11,7 +11,8 @@ const VOCAB_SONGS=[
   {id:'song_u2_family',title:"Who's Who?",topic:'Family',unit:2,src:'assets/songs/whos_who.mp4'},
   {id:'song_u2_appearance',title:'Look Again',topic:'Physical Appearance',unit:2,src:'assets/songs/look_again.mp4'},
   {id:'song_u3_earbuds',title:'Where Are My Earbuds?',topic:'Rooms & Prepositions of Place',unit:3,src:'assets/songs/where_are_my_earbuds.mp4'},
-  {id:'song_u4_give_try',title:'Give It a Try',topic:'Free Time & Sports',unit:4,src:'assets/songs/give_it_a_try.mp4'}
+  {id:'song_u4_give_try',title:'Give It a Try',topic:'Free Time & Sports',unit:4,src:'assets/songs/give_it_a_try.mp4'},
+  {id:'song_u5_final_bell',title:'Final Bell',topic:'School',unit:5,src:'assets/songs/final_bell.mp4'}
 ];
 
 function isUnitUnlocked(unit){return true}
@@ -357,6 +358,7 @@ function showUnit1(){renderUnit(1)}
 function showUnit2(){renderUnit(2)}
 function showUnit3(){renderUnit(3)}
 function showUnit4(){renderUnit(4)}
+function showUnit5(){renderUnit(5)}
 function card(e,cat){
  const unit=e.unit||1;
  const r=JSON.parse(localStorage.getItem(userKey('results'))||'{}')[e.id];
@@ -551,7 +553,11 @@ function badgeData(){
   ['Unit 4 · Vocabulary Explorer','Perfect score in every Unit 4 Vocabulary exercise',allPerfect(4,'Vocabulary'),'badge_u4_vocabulary.png'],
   ['Unit 4 · Grammar Master','Perfect score in every Unit 4 Grammar exercise',allPerfect(4,'Grammar'),'badge_u4_grammar.png'],
   ['Unit 4 · Reading Explorer','Perfect score in the Unit 4 Reading exercise',allPerfect(4,'Reading Comprehension'),'badge_u4_reading.png'],
-  ['Unit 4 · Revision Master','Perfect score in every Unit 4 Revision exercise',allPerfect(4,'Revision'),'badge_u4_revision.png']
+  ['Unit 4 · Revision Master','Perfect score in every Unit 4 Revision exercise',allPerfect(4,'Revision'),'badge_u4_revision.png'],
+  ['Unit 5 · Vocabulary Explorer','Perfect score in every Unit 5 Vocabulary exercise',allPerfect(5,'Vocabulary'),'badge_u5_vocabulary.png'],
+  ['Unit 5 · Grammar Master','Perfect score in every Unit 5 Grammar exercise',allPerfect(5,'Grammar'),'badge_u5_grammar.png'],
+  ['Unit 5 · Reading Explorer','Perfect score in the Unit 5 Reading exercise',allPerfect(5,'Reading Comprehension'),'badge_u5_reading.png'],
+  ['Unit 5 · Revision Master','Perfect score in every Unit 5 Revision exercise',allPerfect(5,'Revision'),'badge_u5_revision.png']
  ];
 }
 function renderBadges(){
@@ -606,3 +612,27 @@ document.addEventListener('cut',e=>{if(document.body.classList.contains('student
 document.addEventListener('paste',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
 document.addEventListener('dragstart',e=>{if(document.body.classList.contains('student-mode'))e.preventDefault()});
 document.addEventListener('keydown',e=>{if(document.body.classList.contains('student-mode')&&((e.ctrlKey||e.metaKey)&&['c','v','x','s','p','u'].includes(e.key.toLowerCase())))e.preventDefault()});
+
+
+// Unit 5 patch: UI integration + keyboard login
+(function installUnit5UI(){
+  function apply(){
+    const grid=document.querySelector('#units .unit-grid');
+    if(grid && !grid.querySelector('[data-unit="5"]')){
+      const d=document.createElement('div');d.className='unit';d.dataset.unit='5';
+      d.innerHTML='<b>Unit 5</b><span>School · people & activities · Present Simple · prepositions of time</span>';
+      d.onclick=()=>showUnit5();grid.appendChild(d);
+    }
+    document.querySelectorAll('#topics .visual-category-grid small').forEach(el=>{
+      if(/^Units 1[–-]4\b/.test(el.textContent)) el.textContent=el.textContent.replace(/^Units 1[–-]4/,'Units 1–5');
+    });
+    const footer=document.querySelector('footer span');
+    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-]4/g,'Units 1–5').replace(/v1\.3\.\d+/,'v1.4.0');
+  }
+  function bindEnter(){
+    ['studentUserIdInput','studentPasswordInput'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();studentLogin();}}));
+    document.getElementById('teacherCodeInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();teacherLogin();}});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{apply();bindEnter();});
+  else {apply();bindEnter();}
+})();
