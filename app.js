@@ -711,7 +711,7 @@ document.addEventListener('keydown',e=>{if(document.body.classList.contains('stu
       if(/^Units 1[–-]4\b/.test(el.textContent)) el.textContent=el.textContent.replace(/^Units 1[–-]4/,'Units 1–5');
     });
     const footer=document.querySelector('footer span');
-    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-]4/g,'Units 1–5').replace(/v1\.[0-9]+\.[0-9]+/,'v1.5.3');
+    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-]4/g,'Units 1–5').replace(/v1\.[0-9]+\.[0-9]+/,'v1.5.4');
   }
   function bindEnter(){
     ['studentUserIdInput','studentPasswordInput'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();studentLogin();}}));
