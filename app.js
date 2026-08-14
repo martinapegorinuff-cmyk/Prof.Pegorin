@@ -6,6 +6,12 @@ const CURRENT_USER_KEY='pp_current_user';
 const HOUSE_POINTS_START = new Date(2026,8,1,0,0,0); // 1 September 2026
 const SCHOOL_MONTHS=['September','October','November','December','January','February','March','April','May','June'];
 
+const VOCAB_SONGS=[
+  {id:'song_u1_countries',title:'Where Are You From?',topic:'Countries & Nationalities',unit:1,src:'assets/songs/where_are_you_from.mp4'},
+  {id:'song_u2_family',title:"Who's Who?",topic:'Family',unit:2,src:'assets/songs/whos_who.mp4'},
+  {id:'song_u2_appearance',title:'Look Again',topic:'Physical Appearance',unit:2,src:'assets/songs/look_again.mp4'}
+];
+
 function isUnitUnlocked(unit){return true}
 function updateUnitAccessUI(){}
 function renderTeacherUnitAccess(){}
@@ -19,7 +25,7 @@ function renderSongs(mode=currentSongSort){
   const active={title:'songSortTitle',topic:'songSortTopic',unit:'songSortUnit'}[mode];document.getElementById(active)?.classList.add('active');
   const box=document.getElementById('songsList');if(!box)return;
   const songs=[...VOCAB_SONGS];
-  if(!songs.length){box.innerHTML='<div class="locked-content"><div class="lock-symbol">♫</div><h2>No songs available yet</h2><p>Your teacher will unlock songs together with their units.</p></div>';return}
+  if(!songs.length){box.innerHTML='<div class="locked-content"><div class="lock-symbol">♫</div><h2>No songs available yet</h2><p>More vocabulary songs will be added here.</p></div>';return}
   if(mode==='unit'){
     const groups=[...new Set(songs.map(s=>s.unit))].sort((a,b)=>a-b);
     box.innerHTML=groups.map(u=>`<section class="song-group"><h2>Unit ${u}</h2><div class="song-grid">${songs.filter(s=>s.unit===u).sort((a,b)=>a.title.localeCompare(b.title,'en')).map(songCard).join('')}</div></section>`).join('');
