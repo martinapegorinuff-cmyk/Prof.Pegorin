@@ -3,6 +3,38 @@ const LOGIN_KEY='pp_current_role';
 const USERS_KEY='pp_users_v2';
 const CURRENT_USER_KEY='pp_current_user';
 
+const HOUSE_POINTS_START = new Date(2026,8,1,0,0,0); // 1 September 2026
+const SCHOOL_MONTHS=['September','October','November','December','January','February','March','April','May','June'];
+
+function housePointsSeasonOpen(d=new Date()){return d>=HOUSE_POINTS_START}
+function monthName(d=new Date()){return d.toLocaleString('en-US',{month:'long'})}
+function getHousePointMonths(userId=activeUserId()){
+  return JSON.parse(localStorage.getItem(userKey('housepoints_months',userId))||'{}');
+}
+function saveHousePointMonths(data,userId=activeUserId()){
+  localStorage.setItem(userKey('housepoints_months',userId),JSON.stringify(data));
+}
+function housePointsForMonth(month,userId=activeUserId()){
+  if(!housePointsSeasonOpen()) return 0;
+  const data=getHousePointMonths(userId);
+  return +(data[month]||0);
+}
+function schoolYearHousePoints(userId=activeUserId()){
+  if(!housePointsSeasonOpen()) return 0;
+  const data=getHousePointMonths(userId);
+  return SCHOOL_MONTHS.reduce((sum,m)=>sum+(+(data[m]||0)),0);
+}
+function addHousePoints(points,userId=activeUserId(),d=new Date()){
+  if(!housePointsSeasonOpen(d)) return false;
+  const m=monthName(d);
+  if(!SCHOOL_MONTHS.includes(m)) return false;
+  const data=getHousePointMonths(userId);
+  data[m]=+(data[m]||0)+points;
+  saveHousePointMonths(data,userId);
+  return true;
+}
+
+
 function getUsers(){return JSON.parse(localStorage.getItem(USERS_KEY)||'{}')}
 function saveUsers(users){localStorage.setItem(USERS_KEY,JSON.stringify(users))}
 function activeUserId(){return localStorage.getItem(CURRENT_USER_KEY)||sessionStorage.getItem(CURRENT_USER_KEY)||''}
@@ -139,7 +171,9 @@ const MONTH_DEMO={
 };
 function teacherMonth(m){
   const data={Gryffindor:0,Slytherin:0,Ravenclaw:0,Hufflepuff:0};
-  Object.entries(getUsers()).forEach(([id,u])=>{data[u.house]+=+(localStorage.getItem(userKey('housepoints',id))||0)});
+  Object.entries(getUsers()).forEach(([id,u])=>{
+    data[u.house]+=m==='School Year'?schoolYearHousePoints(id):housePointsForMonth(m,id);
+  });
   document.getElementById('teacherMonthTitle').textContent=`${m} House Points`;
   document.getElementById('teacherMonthData').innerHTML=Object.entries(data).map(([h,v])=>`<tr><td>${h}</td><td><b>${v}</b></td></tr>`).join('');
 }
@@ -147,7 +181,7 @@ function teacherUserStats(userId){
   const results=JSON.parse(localStorage.getItem(userKey('results',userId))||'{}');
   const vals=Object.values(results);
   const avg=vals.length?Math.round(vals.reduce((a,b)=>a+(b.pct||0),0)/vals.length):null;
-  const hp=+(localStorage.getItem(userKey('housepoints',userId))||0);
+  const hp=schoolYearHousePoints(userId);
   return {vals,avg,hp};
 }
 function jsArg(s){return encodeURIComponent(String(s))}
@@ -185,7 +219,7 @@ function teacherUserStats(userId){
   const results=JSON.parse(localStorage.getItem(userKey('results',userId))||'{}');
   const vals=Object.values(results);
   const avg=vals.length?Math.round(vals.reduce((a,b)=>a+(b.pct||0),0)/vals.length):null;
-  const hp=+(localStorage.getItem(userKey('housepoints',userId))||0);
+  const hp=schoolYearHousePoints(userId);
   return {vals,avg,hp};
 }
 function jsArg(s){return encodeURIComponent(String(s))}
@@ -382,15 +416,21 @@ function checkExercise(){
  let pct=Math.round(correct/total*100);
  document.getElementById('feedback').innerHTML=`<div class="scorebox"><h2>${correct}/${total} · ${pct}%</h2><p>${pct>=85?'Excellent!':pct>=60?'Well done!':'Good try! Check your answers and try again.'}</p></div>`;
  let at=attempts(); at[e.id]=(at[e.id]||0)+1; localStorage.setItem(userKey('attempts'),JSON.stringify(at));
- let earned=at[e.id]===1?e.points:(at[e.id]<=3?1:0);
+ let earned=0;
+ if(housePointsSeasonOpen()){
+   const hat=JSON.parse(localStorage.getItem(userKey('house_attempts'))||'{}');
+   hat[e.id]=(hat[e.id]||0)+1;
+   localStorage.setItem(userKey('house_attempts'),JSON.stringify(hat));
+   earned=hat[e.id]===1?e.points:(hat[e.id]<=3?1:0);
+ }
  saveResult(e.id,{title:e.title,score:correct,total,pct,points:earned,cat:e.cat,date:new Date().toLocaleDateString(),attempt:at[e.id]});
  if(earned>0) award(earned); else refresh();
 }
 function completedBefore(id){let r=JSON.parse(localStorage.getItem(userKey('awarded'))||'{}');if(r[id])return true;r[id]=true;localStorage.setItem(userKey('awarded'),JSON.stringify(r));return false}
 function saveResult(id,obj){let r=JSON.parse(localStorage.getItem(userKey('results'))||'{}');const prev=r[id]||{};obj.best=Math.max(prev.best??prev.pct??0,obj.pct??0);obj.first=prev.first??obj.pct;obj.latest=obj.pct;r[id]={...prev,...obj};localStorage.setItem(userKey('results'),JSON.stringify(r))}
 function award(points){
- let hp=+(localStorage.getItem(userKey('housepoints'))||0);hp+=points;localStorage.setItem(userKey('housepoints'),hp);
- const profile=currentProfile();const house=profile.house||localStorage.getItem(userKey('house'))||'Gryffindor';localStorage.setItem(userKey('house'),house);
+ if(!addHousePoints(points)){refresh();return}
+ const profile=currentProfile();const house=profile.house||'Gryffindor';
  const colors={Gryffindor:'#a6202b',Slytherin:'#26734a',Ravenclaw:'#27659a',Hufflepuff:'#e2b72f'};
  document.documentElement.style.setProperty('--gem',colors[house]);
  document.getElementById('rewardTitle').textContent=`+${points} House Points!`;
@@ -401,7 +441,7 @@ function award(points){
 }
 function closeReward(){document.getElementById('rewardOverlay').classList.remove('show')}
 function refresh(){
- const results=JSON.parse(localStorage.getItem(userKey('results'))||'{}');const hp=+(localStorage.getItem(userKey('housepoints'))||0);
+ const results=JSON.parse(localStorage.getItem(userKey('results'))||'{}');const hp=schoolYearHousePoints();
  ['housePoints','housePoints2'].forEach(id=>{let x=document.getElementById(id);if(x)x.textContent=hp});let dc=document.getElementById('doneCount');if(dc)dc.textContent=Object.keys(results).length;
  let rb=document.getElementById('resultsBox');if(rb)rb.innerHTML=Object.values(results).length?Object.values(results).map(r=>`<p><b>${r.title}</b> — ${r.score}/${r.total} (${r.pct}%)</p>`).join(''):'<p>No exercises completed yet.</p>';
 }
@@ -475,9 +515,12 @@ function adminChangeHouse(userId){
  updateUser(userId,{house:h});refreshTeacher();teacherMonth('School Year');
 }
 function adminRemovePoints(userId){
- const hp=+(localStorage.getItem(userKey('housepoints',userId))||0);
- const n=+(prompt('How many House Points do you want to remove?','1')||0);
- if(n>0)localStorage.setItem(userKey('housepoints',userId),Math.max(0,hp-n));
+ if(!housePointsSeasonOpen()){alert('House Points start on 1 September.');return}
+ const month=monthName();
+ const data=getHousePointMonths(userId);
+ const hp=+(data[month]||0);
+ const n=+(prompt(`How many House Points do you want to remove from ${month}?`,'1')||0);
+ if(n>0){data[month]=Math.max(0,hp-n);saveHousePointMonths(data,userId)}
  refreshTeacher();teacherMonth('School Year');
 }
 function adminToggleBan(userId){

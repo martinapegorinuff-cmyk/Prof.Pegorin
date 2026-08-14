@@ -127,3 +127,11 @@ v1.2.1
 - Reworded Unit 3 Reading 2 final answer using language already present in the text.
 - Corrected footer to Units 1–3.
 - Added and linked the four final Unit 3 badge images.
+
+v1.2.2
+- Rewrote Unit 3 V2 Exercise 2 so it uses different spatial relationships from Exercise 1.
+- House Points collection now starts on 1 September 2026.
+- Exercises completed in August still save normal progress/results/attempts, but award no House Points.
+- House Point attempt counting also begins on 1 September, so August practice does not reduce September earning opportunities.
+- House Points are now stored by month. September, October, etc. no longer display the same all-time total.
+- Legacy prototype House Point totals are ignored; the 2026/27 House competition starts cleanly from September.
