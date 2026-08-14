@@ -324,7 +324,9 @@ function go(id,record=true){
  if(record && current && current!==id) PAGE_HISTORY.push(current);
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  document.getElementById(id)?.classList.add('active');
- window.scrollTo(0,0);refresh();
+ window.scrollTo(0,0);
+ refresh();
+ if(id==='songs') renderSongs(currentSongSort);
 }
 function navBack(){
  const previous=PAGE_HISTORY.pop();
