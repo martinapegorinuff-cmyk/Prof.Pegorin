@@ -9,7 +9,9 @@ const SCHOOL_MONTHS=['September','October','November','December','January','Febr
 const VOCAB_SONGS=[
   {id:'song_u1_countries',title:'Where Are You From?',topic:'Countries & Nationalities',unit:1,src:'assets/songs/where_are_you_from.mp4'},
   {id:'song_u2_family',title:"Who's Who?",topic:'Family',unit:2,src:'assets/songs/whos_who.mp4'},
-  {id:'song_u2_appearance',title:'Look Again',topic:'Physical Appearance',unit:2,src:'assets/songs/look_again.mp4'}
+  {id:'song_u2_appearance',title:'Look Again',topic:'Physical Appearance',unit:2,src:'assets/songs/look_again.mp4'},
+  {id:'song_u3_earbuds',title:'Where Are My Earbuds?',topic:'Rooms & Prepositions of Place',unit:3,src:'assets/songs/where_are_my_earbuds.mp4'},
+  {id:'song_u4_give_try',title:'Give It a Try',topic:'Free Time & Sports',unit:4,src:'assets/songs/give_it_a_try.mp4'}
 ];
 
 function isUnitUnlocked(unit){return true}
