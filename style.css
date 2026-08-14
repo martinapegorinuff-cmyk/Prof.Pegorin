@@ -604,3 +604,6 @@ body.student-mode{user-select:none;-webkit-user-select:none}.watermark{position:
 #teacherRecentActivity .teacher-student-name{
   font-weight:800 !important;
 }
+
+/* v1.2 Unit 3 */
+.clozeSelect{font:inherit;padding:4px 7px;border:1px solid #b79b63;border-radius:6px;background:#fffaf0;color:#18344f}

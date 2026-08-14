@@ -111,3 +111,19 @@ v1.1.2
   Hufflepuff #ECB939
   Slytherin #2a623d
 - The same surname-first display is used in recent activity and exercise results.
+
+v1.2.0
+- Added Unit 3 complete exercise bank.
+- Vocabulary: Rooms & furniture and Prepositions of place.
+- The approved room image is shown independently in both image-based preposition exercises.
+- Grammar: There is/There are, some/any, regular and irregular plurals, mixed grammar challenges.
+- Added two distinct Unit 3 Reading Comprehensions.
+- Added five Unit 3 Revision exercises including a 12-item final challenge.
+- Added Unit 3 to Practice by Unit and updated Practice by Topic labels.
+- Added Unit 3 achievement logic.
+
+v1.2.1
+- Corrected Unit 3 Revision 4 item 8 answer key.
+- Reworded Unit 3 Reading 2 final answer using language already present in the text.
+- Corrected footer to Units 1–3.
+- Added and linked the four final Unit 3 badge images.

@@ -280,6 +280,7 @@ function renderUnit(n){
 }
 function showUnit1(){renderUnit(1)}
 function showUnit2(){renderUnit(2)}
+function showUnit3(){renderUnit(3)}
 function card(e,cat){
  const unit=e.unit||1;
  const r=JSON.parse(localStorage.getItem(userKey('results'))||'{}')[e.id];
@@ -304,6 +305,7 @@ function renderExercise(e,cat){
  if(e.wordbank)h+=`<div class="word-bank">${e.wordbank.map(w=>`<span>${w}</span>`).join('')}</div>`;
  if(e.text)h+=`<div class="reading-text">${e.text.split('\\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
  if(e.type==='cloze')h+=renderCloze(e);
+ else if(e.type==='cloze_mcq')h+=renderClozeMcq(e);
  else if(e.type==='match')h+=renderMatch(e);
  else if(e.type==='multi')h+=renderMulti(e);
  else if(e.type==='demonstrative_mcq')h+=renderDemonstratives(e,true);
@@ -321,6 +323,15 @@ function renderMatch(e){return `<div class="questions">${e.items.map((it,i)=>`<d
 function renderMulti(e){return `<div class="questions">${e.items.map((it,i)=>`<div class="question"><b>${i+1}. ${it[0]}</b><div class="multiinputs">${it[1].map(()=>`<input class="answer" type="text">`).join('')}</div></div>`).join('')}</div>`}
 function renderCloze(e){let n=0;let t=e.text.replace(/___/g,()=>`<input class="clozeInput" data-i="${n++}" type="text">`);return `<div class="reading-text cloze">${t}</div>`}
 
+function renderClozeMcq(e){
+ let t=esc(e.text).replace(/\n/g,'<br>');
+ e.choices.forEach((entry,i)=>{
+   const opts=entry[0];
+   const sel=`<select class="clozeSelect" data-i="${i}"><option value="">Choose...</option>${opts.map(o=>`<option value="${esc(o)}">${o}</option>`).join('')}</select>`;
+   t=t.replace(`(${i+1}) ___`,`(${i+1}) ${sel}`);
+ });
+ return `<div class="reading-text cloze">${t}</div>`;
+}
 function demoIcon(name,many){
  const icons={book:'📕',phone:'📱',bags:'🎒',shoes:'👟',dog:'🐕',girl:'👧',books:'📚',boys:'👦',photo:'🖼️',man:'👨',glasses:'👓',girls:'👧',brother:'👦',parents:'👩‍🦰👨',bag:'🎒',cousins:'🧑🧑',sister:'👧',friends:'🧑🧑',uncle:'👨'};
  return icons[name]||'●';
@@ -345,7 +356,10 @@ function accepts(val,ans){
 }
 function checkExercise(){
  const e=window.current; let correct=0,total=0;
- if(e.type==='cloze'){
+ if(e.type==='cloze_mcq'){
+   const ins=[...document.querySelectorAll('.clozeSelect')];total=e.choices.length;
+   ins.forEach((x,i)=>{let ok=accepts(x.value,e.choices[i][1]);x.classList.toggle('right',ok);x.classList.toggle('wrong',!ok);if(ok)correct++})
+ }else if(e.type==='cloze'){
    const ins=[...document.querySelectorAll('.clozeInput')];total=e.answers.length;
    ins.forEach((x,i)=>{let ok=accepts(x.value,e.answers[i]);x.classList.toggle('right',ok);x.classList.toggle('wrong',!ok);if(ok)correct++})
  }else if(e.type==='multi'){
@@ -436,7 +450,11 @@ function badgeData(){
   ['Unit 2 · Vocabulary Explorer','Perfect score in every Unit 2 Vocabulary exercise',allPerfect(2,'Vocabulary'),'badge_u2_vocabulary.png'],
   ['Unit 2 · Grammar Master','Perfect score in every Unit 2 Grammar exercise',allPerfect(2,'Grammar'),'badge_u2_grammar.png'],
   ['Unit 2 · Reading Explorer','Perfect score in the Unit 2 Reading exercise',allPerfect(2,'Reading Comprehension'),'badge_u2_reading.png'],
-  ['Unit 2 · Revision Master','Perfect score in every Unit 2 Revision exercise',allPerfect(2,'Revision'),'badge_u2_revision.png']
+  ['Unit 2 · Revision Master','Perfect score in every Unit 2 Revision exercise',allPerfect(2,'Revision'),'badge_u2_revision.png'],
+  ['Unit 3 · Vocabulary Explorer','Perfect score in every Unit 3 Vocabulary exercise',allPerfect(3,'Vocabulary'),'badge_u3_vocabulary.png'],
+  ['Unit 3 · Grammar Master','Perfect score in every Unit 3 Grammar exercise',allPerfect(3,'Grammar'),'badge_u3_grammar.png'],
+  ['Unit 3 · Reading Explorer','Perfect score in every Unit 3 Reading exercise',allPerfect(3,'Reading Comprehension'),'badge_u3_reading.png'],
+  ['Unit 3 · Revision Master','Perfect score in every Unit 3 Revision exercise',allPerfect(3,'Revision'),'badge_u3_revision.png']
  ];
 }
 function renderBadges(){
