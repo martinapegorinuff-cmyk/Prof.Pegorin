@@ -810,3 +810,25 @@ body[class*="house-"] .coming,
 body[class*="house-"] .teacher-dashboard{
   color:#25261f;
 }
+
+
+/* ===== v1.5.2 Vocabulary Songs layout fix =====
+   By Title and By Topic are direct .song-grid children of #songList.
+   By Unit remains unchanged because its grids are nested inside .song-group. */
+#songList > .song-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:18px;
+  max-width:1250px;
+  margin:0 auto 32px;
+}
+@media(max-width:1050px) and (min-width:761px){
+  #songList > .song-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+@media(max-width:760px){
+  #songList > .song-grid{
+    grid-template-columns:1fr !important;
+  }
+}
