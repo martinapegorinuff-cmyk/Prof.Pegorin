@@ -462,6 +462,7 @@ function go(id,record=true){
  window.scrollTo(0,0);
  refresh();
  if(id==='songs') renderSongs(currentSongSort);
+ if(id==='badges') renderBadges();
 }
 function navBack(){
  const previous=PAGE_HISTORY.pop();
@@ -635,10 +636,12 @@ function refresh(){
  let rb=document.getElementById('resultsBox');if(rb)rb.innerHTML=Object.values(results).length?Object.values(results).map(r=>`<p><b>${r.title}</b> — ${r.score}/${r.total} (${r.pct}%)</p>`).join(''):'<p>No exercises completed yet.</p>';
  updateUnitAccessUI();
  if(document.getElementById('songs')?.classList.contains('active'))renderSongs(currentSongSort);
+ renderBadges();
 }
 
 
 document.addEventListener('DOMContentLoaded',()=>{
+  renderBadges();
   const role=localStorage.getItem(LOGIN_KEY)||sessionStorage.getItem(LOGIN_KEY);
   if(role==='student'&&activeUserId()&&resolveUser(activeUserId()))openStudentApp();
   else if(role==='teacher')openTeacherApp();
@@ -656,7 +659,7 @@ function getProgress(){
  const results=JSON.parse(localStorage.getItem(userKey('results'))||'{}');
  return Object.entries(results).reduce((acc,[id,r])=>{
    const ex=allExercises().find(e=>e.id===id);
-   acc[id]={id,best:r.best??r.pct??0,last:r.pct??0,stars:ex?.stars??0,unit:ex?.unit??1,cat:ex?.cat??r.cat??'',title:r.title||ex?.title||id,attempts:(attempts()[id]||r.attempt||1)};
+   acc[id]={id,best:r.best??r.pct??0,first:r.first??r.pct??0,last:r.latest??r.pct??0,stars:ex?.stars??0,unit:ex?.unit??1,cat:ex?.cat??r.cat??'',title:r.title||ex?.title||id,attempts:(attempts()[id]||r.attempt||1)};
    return acc;
  },{});
 }
@@ -787,7 +790,6 @@ function renderBadges(){
  }).join('');
 }
 
-const oldRefresh=refresh;refresh=function(){oldRefresh();renderBadges();}
 function adminChangeHouse(userId){
  const u=getUsers()[userId];if(!u)return;
  const h=prompt('New House: Gryffindor, Slytherin, Ravenclaw or Hufflepuff',u.house||'');
@@ -854,7 +856,7 @@ document.addEventListener('keydown',e=>{if(document.body.classList.contains('stu
       if(/^Units 1[–-][456]\b/.test(el.textContent)) el.textContent=el.textContent.replace(/^Units 1[–-][456]/,'Units 1–7');
     });
     const footer=document.querySelector('footer span');
-    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-][456]/g,'Units 1–7').replace(/v1\.[0-9]+\.[0-9]+/,'v1.7.1');
+    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-][456]/g,'Units 1–7').replace(/v1\.[0-9]+\.[0-9]+/,'v1.7.2');
   }
   function bindEnter(){
     ['studentUserIdInput','studentPasswordInput'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();studentLogin();}}));
