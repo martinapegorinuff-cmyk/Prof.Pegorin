@@ -49,8 +49,54 @@ function updateUnitAccessUI(){}
 function renderTeacherUnitAccess(){}
 let currentSongSort='title';
 function songCard(song){
-  return `<article class="song-card"><div class="song-meta"><span class="unit-pill">Unit ${song.unit}</span><span>${song.topic}</span></div><h3>${song.title}</h3><video controls preload="metadata" playsinline src="${song.src}">Your browser does not support video playback.</video></article>`;
+  return `<article class="song-card" data-song-id="${song.id}"><div class="song-meta"><span class="unit-pill">Unit ${song.unit}</span><span>${song.topic}</span></div><h3>${song.title}</h3><video controls preload="metadata" playsinline src="${song.src}">Your browser does not support video playback.</video></article>`;
 }
+
+function getCompletedSongs(){
+  return JSON.parse(localStorage.getItem(userKey('completed_songs'))||'{}');
+}
+function songIsCompleted(songId){
+  return !!getCompletedSongs()[songId];
+}
+function markSongCompleted(songId){
+  if(teacherPreviewMode)return;
+  const done=getCompletedSongs();
+  if(done[songId])return;
+  done[songId]=true;
+  localStorage.setItem(userKey('completed_songs'),JSON.stringify(done));
+  renderBadges();
+}
+function attachSongTracking(){
+  document.querySelectorAll('#songsList .song-card').forEach(card=>{
+    const songId=card.dataset.songId;
+    const video=card.querySelector('video');
+    if(!songId||!video||video.dataset.trackingAttached==='1')return;
+    video.dataset.trackingAttached='1';
+    let listened=0;
+    let lastTime=0;
+    let seeking=false;
+
+    video.addEventListener('play',()=>{lastTime=video.currentTime||0;});
+    video.addEventListener('seeking',()=>{seeking=true;});
+    video.addEventListener('seeked',()=>{seeking=false;lastTime=video.currentTime||0;});
+    video.addEventListener('timeupdate',()=>{
+      const now=video.currentTime||0;
+      if(!video.paused && !seeking){
+        const delta=now-lastTime;
+        // Normal playback advances in small increments. Large jumps are seeks and do not count.
+        if(delta>0 && delta<=2.5)listened+=delta;
+      }
+      lastTime=now;
+      const duration=Number.isFinite(video.duration)?video.duration:0;
+      if(duration>0 && listened>=duration*0.90)markSongCompleted(songId);
+    });
+    video.addEventListener('ended',()=>{
+      const duration=Number.isFinite(video.duration)?video.duration:0;
+      if(duration>0 && listened>=duration*0.90)markSongCompleted(songId);
+    });
+  });
+}
+
 function renderSongs(mode=currentSongSort){
   currentSongSort=mode;
   document.querySelectorAll('.song-sort').forEach(b=>b.classList.remove('active'));
@@ -68,6 +114,7 @@ function renderSongs(mode=currentSongSort){
     const ordered=[...songs].sort((a,b)=>a.title.localeCompare(b.title,'en'));
     box.innerHTML=`<div class="song-grid">${ordered.map(songCard).join('')}</div>`;
   }
+  attachSongTracking();
 }
 
 function housePointsSeasonOpen(d=new Date()){return d>=HOUSE_POINTS_START}
@@ -565,6 +612,7 @@ function checkExercise(){
    earned=hat[e.id]===1?e.points:(hat[e.id]<=3?1:0);
  }
  saveResult(e.id,{title:e.title,score:correct,total,pct,points:earned,cat:e.cat,date:new Date().toLocaleDateString(),attempt:at[e.id]});
+ updateAchievementTracking(e,pct);
  if(earned>0) award(earned); else refresh();
 }
 function completedBefore(id){let r=JSON.parse(localStorage.getItem(userKey('awarded'))||'{}');if(r[id])return true;r[id]=true;localStorage.setItem(userKey('awarded'),JSON.stringify(r));return false}
@@ -612,60 +660,133 @@ function getProgress(){
    return acc;
  },{});
 }
+function getAchievementState(){
+ return JSON.parse(localStorage.getItem(userKey('achievement_state'))||'{}');
+}
+function saveAchievementState(state){
+ localStorage.setItem(userKey('achievement_state'),JSON.stringify(state));
+}
+function updateAchievementTracking(ex,pct){
+ if(teacherPreviewMode)return;
+ const state=getAchievementState();
+ state.perfectStreakIds=Array.isArray(state.perfectStreakIds)?state.perfectStreakIds:[];
+ state.perfectStreakMax=+(state.perfectStreakMax||0);
+ if(pct===100){
+   // Repeating the same exercise cannot artificially build the streak.
+   if(!state.perfectStreakIds.includes(ex.id))state.perfectStreakIds.push(ex.id);
+   state.perfectStreakMax=Math.max(state.perfectStreakMax,state.perfectStreakIds.length);
+ }else{
+   state.perfectStreakIds=[];
+ }
+ saveAchievementState(state);
+}
+
 function badgeData(){
  const rs=Object.values(getProgress());
  const perfect=rs.filter(r=>r.best===100).length;
  const perfect3=rs.filter(r=>r.best===100 && r.stars===3).length;
  const perfectIds=new Set(rs.filter(r=>r.best===100).map(r=>r.id));
+ const completedIds=new Set(rs.map(r=>r.id));
+ const availableUnits=[...new Set(allExercises().map(e=>e.unit))].sort((a,b)=>a-b);
+ const cats=['Vocabulary','Grammar','Reading Comprehension','Revision'];
  const allPerfect=(unit,cat)=>{
    const ids=allExercises().filter(e=>e.unit===unit && e.cat===cat).map(e=>e.id);
    return ids.length>0 && ids.every(id=>perfectIds.has(id));
  };
- return [
-  ['Perfect Start','Perfect score in 1 exercise',perfect>=1,'badge_perfect_start.png'],
-  ['Perfect Five','Perfect score in 5 exercises',perfect>=5,'badge_perfect_five.png'],
-  ['Perfect Ten','Perfect score in 10 exercises',perfect>=10,'badge_perfect_ten.png'],
-  ['Challenge Master','Perfect score in 20 three-star exercises',perfect3>=20,'badge_challenge_master.png'],
-  ['Unit 1 · Vocabulary Explorer','Perfect score in every Unit 1 Vocabulary exercise',allPerfect(1,'Vocabulary'),'badge_u1_vocabulary.png'],
-  ['Unit 1 · Grammar Master','Perfect score in every Unit 1 Grammar exercise',allPerfect(1,'Grammar'),'badge_u1_grammar.png'],
-  ['Unit 1 · Reading Explorer','Perfect score in the Unit 1 Reading exercise',allPerfect(1,'Reading Comprehension'),'badge_u1_reading.png'],
-  ['Unit 1 · Revision Master','Perfect score in every Unit 1 Revision exercise',allPerfect(1,'Revision'),'badge_u1_revision.png'],
-  ['Unit 2 · Vocabulary Explorer','Perfect score in every Unit 2 Vocabulary exercise',allPerfect(2,'Vocabulary'),'badge_u2_vocabulary.png'],
-  ['Unit 2 · Grammar Master','Perfect score in every Unit 2 Grammar exercise',allPerfect(2,'Grammar'),'badge_u2_grammar.png'],
-  ['Unit 2 · Reading Explorer','Perfect score in the Unit 2 Reading exercise',allPerfect(2,'Reading Comprehension'),'badge_u2_reading.png'],
-  ['Unit 2 · Revision Master','Perfect score in every Unit 2 Revision exercise',allPerfect(2,'Revision'),'badge_u2_revision.png'],
-  ['Unit 3 · Vocabulary Explorer','Perfect score in every Unit 3 Vocabulary exercise',allPerfect(3,'Vocabulary'),'badge_u3_vocabulary.png'],
-  ['Unit 3 · Grammar Master','Perfect score in every Unit 3 Grammar exercise',allPerfect(3,'Grammar'),'badge_u3_grammar.png'],
-  ['Unit 3 · Reading Explorer','Perfect score in every Unit 3 Reading exercise',allPerfect(3,'Reading Comprehension'),'badge_u3_reading.png'],
-  ['Unit 3 · Revision Master','Perfect score in every Unit 3 Revision exercise',allPerfect(3,'Revision'),'badge_u3_revision.png'],
-  ['Unit 4 · Vocabulary Explorer','Perfect score in every Unit 4 Vocabulary exercise',allPerfect(4,'Vocabulary'),'badge_u4_vocabulary.png'],
-  ['Unit 4 · Grammar Master','Perfect score in every Unit 4 Grammar exercise',allPerfect(4,'Grammar'),'badge_u4_grammar.png'],
-  ['Unit 4 · Reading Explorer','Perfect score in the Unit 4 Reading exercise',allPerfect(4,'Reading Comprehension'),'badge_u4_reading.png'],
-  ['Unit 4 · Revision Master','Perfect score in every Unit 4 Revision exercise',allPerfect(4,'Revision'),'badge_u4_revision.png'],
-  ['Unit 5 · Vocabulary Explorer','Perfect score in every Unit 5 Vocabulary exercise',allPerfect(5,'Vocabulary'),'badge_u5_vocabulary.png'],
-  ['Unit 5 · Grammar Master','Perfect score in every Unit 5 Grammar exercise',allPerfect(5,'Grammar'),'badge_u5_grammar.png'],
-  ['Unit 5 · Reading Explorer','Perfect score in the Unit 5 Reading exercise',allPerfect(5,'Reading Comprehension'),'badge_u5_reading.png'],
-  ['Unit 5 · Revision Master','Perfect score in every Unit 5 Revision exercise',allPerfect(5,'Revision'),'badge_u5_revision.png'],
-  ['Unit 6 · Vocabulary Explorer','Perfect score in every Unit 6 Vocabulary exercise',allPerfect(6,'Vocabulary'),'badge_u6_vocabulary.png'],
-  ['Unit 6 · Grammar Master','Perfect score in every Unit 6 Grammar exercise',allPerfect(6,'Grammar'),'badge_u6_grammar.png'],
-  ['Unit 6 · Reading Explorer','Perfect score in every Unit 6 Reading exercise',allPerfect(6,'Reading Comprehension'),'badge_u6_reading.png'],
-  ['Unit 6 · Revision Master','Perfect score in every Unit 6 Revision exercise',allPerfect(6,'Revision'),'badge_u6_revision.png'],
-  ['Unit 7 · Vocabulary Explorer','Perfect score in every Unit 7 Vocabulary exercise',allPerfect(7,'Vocabulary'),'badge_u7_vocabulary.png'],
-  ['Unit 7 · Grammar Master','Perfect score in every Unit 7 Grammar exercise',allPerfect(7,'Grammar'),'badge_u7_grammar.png'],
-  ['Unit 7 · Reading Explorer','Perfect score in every Unit 7 Reading exercise',allPerfect(7,'Reading Comprehension'),'badge_u7_reading.png'],
-  ['Unit 7 · Revision Master','Perfect score in every Unit 7 Revision exercise',allPerfect(7,'Revision'),'badge_u7_revision.png']
+ const categoryBadgeEarned=cat=>availableUnits.some(u=>allPerfect(u,cat));
+ const allFourInUnit=unit=>cats.every(cat=>allPerfect(unit,cat));
+ const grammarPerfect=rs.filter(r=>r.best===100&&r.cat==='Grammar').length;
+ const vocabPerfect=rs.filter(r=>r.best===100&&r.cat==='Vocabulary').length;
+ const readingPerfect=rs.filter(r=>r.best===100&&r.cat==='Reading Comprehension').length;
+ const levelUp=rs.some(r=>(r.first??100)<100 && r.best===100);
+ const recovered=rs.filter(r=>(r.first??100)<60 && r.best>=60).length;
+ const achievementState=getAchievementState();
+ const onFire=(achievementState.perfectStreakMax||0)>=5;
+ const allRounder=cats.every(categoryBadgeEarned);
+ const unitChampion=availableUnits.some(allFourInUnit);
+ const explorer=availableUnits.length>0 && availableUnits.every(u=>allExercises().filter(e=>e.unit===u).some(e=>completedIds.has(e.id)));
+ const masterOfEnglish=availableUnits.length>0 && availableUnits.every(allFourInUnit);
+ const songDone=getCompletedSongs();
+ const musicMaster=VOCAB_SONGS.length>0 && VOCAB_SONGS.every(s=>songDone[s.id]);
+
+ const badges=[
+  {group:'milestones',title:'Perfect Start',desc:'Perfect score in 1 exercise',unlocked:perfect>=1,img:'badge_perfect_start.png'},
+  {group:'milestones',title:'Perfect Five',desc:'Perfect score in 5 exercises',unlocked:perfect>=5,img:'badge_perfect_five.png'},
+  {group:'milestones',title:'Perfect Ten',desc:'Perfect score in 10 exercises',unlocked:perfect>=10,img:'badge_perfect_ten.png'},
+  {group:'milestones',title:'Challenge Master',desc:'Perfect score in 20 three-star exercises',unlocked:perfect3>=20,img:'badge_challenge_master.png'},
+
+  {group:'special',title:'On Fire',desc:'Get a perfect score in 5 different exercises in a row',unlocked:onFire,img:'badge_on_fire.png'},
+  {group:'special',title:'Grammar Genius',desc:'Perfect score in 5 Grammar exercises',unlocked:grammarPerfect>=5,img:'badge_grammar_genius.png'},
+  {group:'special',title:'Word Wizard',desc:'Perfect score in 5 Vocabulary exercises',unlocked:vocabPerfect>=5,img:'badge_word_wizard.png'},
+  {group:'special',title:'Reading Detective',desc:'Perfect score in 3 Reading exercises',unlocked:readingPerfect>=3,img:'badge_reading_detective.png'},
+  {group:'special',title:'All-Rounder',desc:'Earn at least one Vocabulary, Grammar, Reading and Revision unit badge',unlocked:allRounder,img:'badge_all_rounder.png'},
+  {group:'special',title:'Level Up',desc:'Improve an exercise and later get a perfect score',unlocked:levelUp,img:'badge_level_up.png'},
+  {group:'special',title:'Never Give Up',desc:'Pass 5 exercises that you did not pass on your first attempt',unlocked:recovered>=5,img:'badge_never_give_up.png'},
+  {group:'special',title:'Unit Champion',desc:'Earn all 4 badges in the same unit',unlocked:unitChampion,img:'badge_unit_champion.png'},
+  {group:'special',title:'Explorer',desc:'Complete at least one exercise in every available unit',unlocked:explorer,img:'badge_explorer.png'},
+  {group:'special',title:'Master of English',desc:'Earn all 4 unit badges in every available unit',unlocked:masterOfEnglish,img:'badge_master_of_english.png'}
  ];
+
+ const songImages={
+   song_u1_countries:'badge_song_where_are_you_from.png',
+   song_u2_family:'badge_song_whos_who.png',
+   song_u2_appearance:'badge_song_look_again.png',
+   song_u3_earbuds:'badge_song_where_are_my_earbuds.png',
+   song_u4_give_try:'badge_song_give_it_a_try.png',
+   song_u5_final_bell:'badge_song_final_bell.png',
+   song_u6_five_more_minutes:'badge_song_five_more_minutes.png',
+   song_u7_whats_in_the_fridge:'badge_song_whats_in_the_fridge.png'
+ };
+ VOCAB_SONGS.forEach(song=>{
+   badges.push({
+     group:'songs',
+     title:song.title,
+     desc:'Listen to the full Vocabulary Song',
+     unlocked:!!songDone[song.id],
+     img:songImages[song.id]
+   });
+ });
+ badges.push({group:'songs',title:'Music Master',desc:'Listen to every Vocabulary Song',unlocked:musicMaster,img:'badge_music_master.png'});
+
+ availableUnits.forEach(unit=>{
+   [
+    ['Vocabulary Explorer','Vocabulary','Vocabulary'],
+    ['Grammar Master','Grammar','Grammar'],
+    ['Reading Explorer','Reading','Reading Comprehension'],
+    ['Revision Master','Revision','Revision']
+   ].forEach(([label,filePart,cat])=>{
+     badges.push({
+       group:'units',
+       title:`Unit ${unit} · ${label}`,
+       desc:`Perfect score in every Unit ${unit} ${filePart} exercise${cat==='Reading Comprehension'?'':'s'}`,
+       unlocked:allPerfect(unit,cat),
+       img:`badge_u${unit}_${filePart.toLowerCase()}.png`
+     });
+   });
+ });
+ return badges;
 }
 function renderBadges(){
  const x=document.getElementById('badgeGrid');if(!x)return;
- x.innerHTML=badgeData().map(b=>`
-   <div class="badge ${b[2]?'unlocked':'locked'}">
-     <img class="badge-medal-img" src="assets/${b[3]}" alt="${b[0]}">
-     <h3>${b[0]}</h3>
-     <p>${b[1]}</p>
-     <b>${b[2]?'Unlocked':'Locked'}</b>
-   </div>`).join('');
+ const badges=badgeData();
+ const groups=[
+   ['milestones','Milestones'],
+   ['special','Special Achievements'],
+   ['songs','Vocabulary Song Collection'],
+   ['units','Unit Badges']
+ ];
+ const card=b=>`<div class="badge ${b.unlocked?'unlocked':'locked'}">
+   <img class="badge-medal-img" src="assets/${b.img}" alt="${b.title}">
+   <h3>${b.title}</h3>
+   <p>${b.desc}</p>
+   <b>${b.unlocked?'Unlocked':'Locked'}</b>
+ </div>`;
+ x.innerHTML=groups.map(([key,label])=>{
+   const items=badges.filter(b=>b.group===key);
+   return `<section class="badge-collection"><h2>${label}</h2><div class="badge-collection-grid">${items.map(card).join('')}</div></section>`;
+ }).join('');
 }
+
 const oldRefresh=refresh;refresh=function(){oldRefresh();renderBadges();}
 function adminChangeHouse(userId){
  const u=getUsers()[userId];if(!u)return;
@@ -733,7 +854,7 @@ document.addEventListener('keydown',e=>{if(document.body.classList.contains('stu
       if(/^Units 1[–-][456]\b/.test(el.textContent)) el.textContent=el.textContent.replace(/^Units 1[–-][456]/,'Units 1–7');
     });
     const footer=document.querySelector('footer span');
-    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-][456]/g,'Units 1–7').replace(/v1\.[0-9]+\.[0-9]+/,'v1.7.0');
+    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-][456]/g,'Units 1–7').replace(/v1\.[0-9]+\.[0-9]+/,'v1.7.1');
   }
   function bindEnter(){
     ['studentUserIdInput','studentPasswordInput'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();studentLogin();}}));
