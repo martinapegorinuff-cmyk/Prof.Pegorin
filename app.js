@@ -770,26 +770,24 @@ function badgeData(){
  return badges;
 }
 function renderBadges(){
- const x=document.getElementById('badgeGrid');if(!x)return;
  const badges=badgeData();
- const groups=[
-   ['milestones','Milestones'],
-   ['special','Special Achievements'],
-   ['songs','Vocabulary Song Collection'],
-   ['units','Unit Badges']
- ];
- const card=b=>`<div class="badge ${b.unlocked?'unlocked':'locked'}">
+ const targets={
+   milestones:document.getElementById('badgeMilestonesGrid'),
+   special:document.getElementById('badgeSpecialGrid'),
+   songs:document.getElementById('badgeSongsGrid'),
+   units:document.getElementById('badgeUnitsGrid')
+ };
+ const card=b=>`<div class="badge ${b.unlocked?'unlocked':'locked'}" data-badge-title="${b.title}">
    <img class="badge-medal-img" src="assets/${b.img}" alt="${b.title}">
    <h3>${b.title}</h3>
    <p>${b.desc}</p>
    <b>${b.unlocked?'Unlocked':'Locked'}</b>
  </div>`;
- x.innerHTML=groups.map(([key,label])=>{
-   const items=badges.filter(b=>b.group===key);
-   return `<section class="badge-collection"><h2>${label}</h2><div class="badge-collection-grid">${items.map(card).join('')}</div></section>`;
- }).join('');
+ Object.entries(targets).forEach(([group,target])=>{
+   if(!target)return;
+   target.innerHTML=badges.filter(b=>b.group===group).map(card).join('');
+ });
 }
-
 function adminChangeHouse(userId){
  const u=getUsers()[userId];if(!u)return;
  const h=prompt('New House: Gryffindor, Slytherin, Ravenclaw or Hufflepuff',u.house||'');
@@ -856,7 +854,7 @@ document.addEventListener('keydown',e=>{if(document.body.classList.contains('stu
       if(/^Units 1[–-][456]\b/.test(el.textContent)) el.textContent=el.textContent.replace(/^Units 1[–-][456]/,'Units 1–7');
     });
     const footer=document.querySelector('footer span');
-    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-][456]/g,'Units 1–7').replace(/v1\.[0-9]+\.[0-9]+/,'v1.7.2');
+    if(footer) footer.textContent=footer.textContent.replace(/Units 1[–-][456]/g,'Units 1–7').replace(/v1\.[0-9]+\.[0-9]+/,'v1.7.3');
   }
   function bindEnter(){
     ['studentUserIdInput','studentPasswordInput'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();studentLogin();}}));

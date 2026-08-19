@@ -866,3 +866,21 @@ body[class*="house-"] .teacher-dashboard{
 @media(max-width:760px){
   .badge-collection-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
 }
+
+
+/* ===== v1.7.3 robust badge page ===== */
+#badges .badge-collection{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+#badges .badge-collection-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(205px,1fr));
+  gap:14px;
+  min-height:40px;
+}
+#badges .badge{
+  display:flex !important;
+  visibility:visible !important;
+}
